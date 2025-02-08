@@ -1,48 +1,64 @@
 #version 330 core
 
-uniform sampler2D TextureSampler;
-uniform sampler2D NuvemTextureSampler;
+struct Material {
+	sampler2D diffuse;
+	vec3 specular;
+	float shininess;
+};
 
-uniform float Time;
+struct Light {
+    vec3 position;  
+    vec3 direction;
+    float cutOff;
+    float outerCutOff;
 
-uniform vec2 VelocidadeRotacaoNuvem = vec2(0.008, 0.0);
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+
+	float constant;
+	float linear;
+	float quadratic;
+};
+
+uniform Material material;
+uniform Light light;
+uniform vec3 ViewPos;
 
 in vec3 Normal;
-in vec3 Color;
 in vec2 UV;
+in vec3 FragPos;
 
-uniform vec3 DirecaoLuz;
-uniform float IntensidadeLuz;
-uniform vec3 CameraPos;
-
-// Declarando uma variável de saída do tipo vec4
-out vec4 OutColor;
+out vec4 FragColor;
 
 void main(){
-	
-	//Renormalizando o vetor Normal (por causa da interpolação linear)
-	vec3 N = normalize(Normal);
+	vec3 Ambient = light.ambient * texture(material.diffuse, UV).rgb;
 
-	//Calcular o vertor L, inveter a direção da luz
-	vec3 L = -normalize(DirecaoLuz);
+	vec3 Norm = normalize(Normal);
 
-	float calculoIluminacao = max(dot(N, L), 0);
-	
-	vec3 ViewDirection = normalize(DirecaoLuz);
-	vec3 V = -ViewDirection;
+	vec3 LightDir = normalize(light.position - FragPos);
+	float Diff = max(dot(Norm, LightDir), 0.0);
+	vec3 Diffuse = light.diffuse * Diff * texture(material.diffuse, UV).rgb;
 
-	vec3 R = reflect(-L, N);
+	vec3 ViewDir = normalize(ViewPos - FragPos);
+	vec3 ReflectDir = reflect(-LightDir, Norm);
 
-	float Alpha = 50.0;
-	float Specular = pow(max(dot(R, V),0), Alpha);
-	Specular = max(Specular, 0);
+	float Spec = pow(max(dot(ViewDir, ReflectDir), 0.0), material.shininess);
+	vec3 Specular = light.specular * Spec * material.specular;
 
-	vec3 TextureMundoColor = texture(TextureSampler, UV).rgb;
+	float theta = dot(LightDir, normalize(-light.direction)); 
+    float epsilon = (light.cutOff - light.outerCutOff);
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+    Diffuse  *= intensity;
+    Specular *= intensity;
 
-	vec3 TextureNuvemColor = texture(NuvemTextureSampler, UV + Time * VelocidadeRotacaoNuvem).rgb;
+	float distance    = length(light.position - FragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
-	// Aplicando a Luz na textura
-	vec3 FinalColor =  (TextureMundoColor + TextureNuvemColor) * IntensidadeLuz * calculoIluminacao + Specular;
+    Ambient *= attenuation;  
+    Diffuse *= attenuation;
+    Specular *= attenuation; 
 
-	OutColor = vec4(FinalColor, 1.0);
+	vec3 Result = Ambient + Diffuse + Specular;
+	FragColor = vec4(Result, 1.0);
 }

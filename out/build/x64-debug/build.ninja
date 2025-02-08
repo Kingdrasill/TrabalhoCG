@@ -51,7 +51,7 @@ build cmake_object_order_depends_target_TrabalhoFinal: phony || CMakeFiles\Traba
 
 build CMakeFiles\TrabalhoFinal.dir\TrabalhoFinal.cpp.obj: CXX_COMPILER__TrabalhoFinal_unscanned_Debug C$:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\TrabalhoFinal.cpp || cmake_object_order_depends_target_TrabalhoFinal
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1
-  INCLUDES = -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glm -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\stb -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glfw\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glew\include
+  INCLUDES = -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glm -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\stb -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glfw\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glad\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glew\include
   OBJECT_DIR = CMakeFiles\TrabalhoFinal.dir
   OBJECT_FILE_DIR = CMakeFiles\TrabalhoFinal.dir
   TARGET_COMPILE_PDB = CMakeFiles\TrabalhoFinal.dir\
@@ -59,7 +59,7 @@ build CMakeFiles\TrabalhoFinal.dir\TrabalhoFinal.cpp.obj: CXX_COMPILER__Trabalho
 
 build CMakeFiles\TrabalhoFinal.dir\Arquivo.cpp.obj: CXX_COMPILER__TrabalhoFinal_unscanned_Debug C$:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\Arquivo.cpp || cmake_object_order_depends_target_TrabalhoFinal
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1
-  INCLUDES = -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glm -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\stb -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glfw\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glew\include
+  INCLUDES = -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glm -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\stb -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glfw\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glad\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glew\include
   OBJECT_DIR = CMakeFiles\TrabalhoFinal.dir
   OBJECT_FILE_DIR = CMakeFiles\TrabalhoFinal.dir
   TARGET_COMPILE_PDB = CMakeFiles\TrabalhoFinal.dir\
@@ -67,7 +67,7 @@ build CMakeFiles\TrabalhoFinal.dir\Arquivo.cpp.obj: CXX_COMPILER__TrabalhoFinal_
 
 build CMakeFiles\TrabalhoFinal.dir\Textura.cpp.obj: CXX_COMPILER__TrabalhoFinal_unscanned_Debug C$:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\Textura.cpp || cmake_object_order_depends_target_TrabalhoFinal
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1
-  INCLUDES = -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glm -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\stb -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glfw\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glew\include
+  INCLUDES = -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glm -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\stb -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glfw\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glad\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glew\include
   OBJECT_DIR = CMakeFiles\TrabalhoFinal.dir
   OBJECT_FILE_DIR = CMakeFiles\TrabalhoFinal.dir
   TARGET_COMPILE_PDB = CMakeFiles\TrabalhoFinal.dir\
@@ -75,17 +75,17 @@ build CMakeFiles\TrabalhoFinal.dir\Textura.cpp.obj: CXX_COMPILER__TrabalhoFinal_
 
 build CMakeFiles\TrabalhoFinal.dir\Geometria.cpp.obj: CXX_COMPILER__TrabalhoFinal_unscanned_Debug C$:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\Geometria.cpp || cmake_object_order_depends_target_TrabalhoFinal
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1
-  INCLUDES = -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glm -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\stb -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glfw\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glew\include
+  INCLUDES = -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glm -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\stb -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glfw\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glad\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glew\include
   OBJECT_DIR = CMakeFiles\TrabalhoFinal.dir
   OBJECT_FILE_DIR = CMakeFiles\TrabalhoFinal.dir
   TARGET_COMPILE_PDB = CMakeFiles\TrabalhoFinal.dir\
   TARGET_PDB = TrabalhoFinal.pdb
 
-build CMakeFiles\TrabalhoFinal.dir\Camera.cpp.obj: CXX_COMPILER__TrabalhoFinal_unscanned_Debug C$:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\Camera.cpp || cmake_object_order_depends_target_TrabalhoFinal
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1
-  INCLUDES = -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glm -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\stb -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glfw\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glew\include
+build CMakeFiles\TrabalhoFinal.dir\dependencias\glad\src\glad.c.obj: C_COMPILER__TrabalhoFinal_unscanned_Debug C$:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glad\src\glad.c || cmake_object_order_depends_target_TrabalhoFinal
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Ob0 /Od /RTC1
+  INCLUDES = -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glm -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\stb -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glfw\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glad\include -IC:\Users\gabri\Documents\CEFET\8P\CG\TrabalhoFinal\dependencias\glew\include
   OBJECT_DIR = CMakeFiles\TrabalhoFinal.dir
-  OBJECT_FILE_DIR = CMakeFiles\TrabalhoFinal.dir
+  OBJECT_FILE_DIR = CMakeFiles\TrabalhoFinal.dir\dependencias\glad\src
   TARGET_COMPILE_PDB = CMakeFiles\TrabalhoFinal.dir\
   TARGET_PDB = TrabalhoFinal.pdb
 
@@ -97,7 +97,7 @@ build CMakeFiles\TrabalhoFinal.dir\Camera.cpp.obj: CXX_COMPILER__TrabalhoFinal_u
 #############################################
 # Link the executable TrabalhoFinal.exe
 
-build TrabalhoFinal.exe: CXX_EXECUTABLE_LINKER__TrabalhoFinal_Debug CMakeFiles\TrabalhoFinal.dir\TrabalhoFinal.cpp.obj CMakeFiles\TrabalhoFinal.dir\Arquivo.cpp.obj CMakeFiles\TrabalhoFinal.dir\Textura.cpp.obj CMakeFiles\TrabalhoFinal.dir\Geometria.cpp.obj CMakeFiles\TrabalhoFinal.dir\Camera.cpp.obj
+build TrabalhoFinal.exe: CXX_EXECUTABLE_LINKER__TrabalhoFinal_Debug CMakeFiles\TrabalhoFinal.dir\TrabalhoFinal.cpp.obj CMakeFiles\TrabalhoFinal.dir\Arquivo.cpp.obj CMakeFiles\TrabalhoFinal.dir\Textura.cpp.obj CMakeFiles\TrabalhoFinal.dir\Geometria.cpp.obj CMakeFiles\TrabalhoFinal.dir\dependencias\glad\src\glad.c.obj
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = glfw3.lib  glew32.lib  opengl32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib

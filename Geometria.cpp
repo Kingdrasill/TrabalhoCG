@@ -167,65 +167,77 @@ GLuint CarregaEsfera(GLuint& TotalVertices, GLuint& TotalIndices, float raio, gl
 	return VAO;
 }
 
-void GerarMalhaCilindro(GLuint resolucao, float altura, float raio, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices) {
+void GerarMalhaCilindro(GLuint resolucao, GLuint numCamadas, float altura, float raio, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices) {
 	Vertices.clear();
 	Indices.clear();
 
 	constexpr float DoisPi = glm::two_pi<float>();
 	const float InversoResolucao = 1.0f / static_cast<float>(resolucao);
+	const float InversoCamadas = 1.0f / static_cast<float>(numCamadas - 1);  // Normalize heights
 
-	// Generate cylinder vertices
-	for (GLuint i = 0; i <= resolucao; ++i) {
-		float angulo = i * InversoResolucao * DoisPi;
-		float x = raio * glm::cos(angulo);
-		float z = raio * glm::sin(angulo);
+	// Generate cylinder vertices in multiple layers
+	for (GLuint j = 0; j < numCamadas; ++j) {
+		float alturaAtual = -altura / 2.0f + j * InversoCamadas * altura; // Interpolating heights
+		float vTexCoord = static_cast<float>(j) * InversoCamadas;
 
-		glm::vec3 normal = glm::normalize(glm::vec3{ x, 0.0f, z });
+		for (GLuint i = 0; i <= resolucao; ++i) {
+			float angulo = i * InversoResolucao * DoisPi;
+			float x = raio * glm::cos(angulo);
+			float z = raio * glm::sin(angulo);
 
-		// Top and bottom vertices
-		Vertices.push_back(Vertice{ Centro + glm::vec3{x, altura / 2.0f, z}, normal, glm::vec3{1.0f, 1.0f, 1.0f}, glm::vec2{i * InversoResolucao, 1.0f} });
-		Vertices.push_back(Vertice{ Centro + glm::vec3{x, -altura / 2.0f, z}, normal, glm::vec3{1.0f, 1.0f, 1.0f}, glm::vec2{i * InversoResolucao, 0.0f} });
+			glm::vec3 normal = glm::normalize(glm::vec3{ x, 0.0f, z });
+
+			// Adding vertices in multiple layers
+			Vertices.push_back(Vertice{
+				Centro + glm::vec3{x, alturaAtual, z},
+				normal,
+				glm::vec3{1.0f, 1.0f, 1.0f},
+				glm::vec2{1.0f - i * InversoResolucao, vTexCoord}
+				});
+		}
 	}
 
-	// Top center vertex
+	// Indices for side faces (connecting vertical layers)
+	for (GLuint j = 0; j < numCamadas - 1; ++j) {
+		for (GLuint i = 0; i < resolucao; ++i) {
+			GLuint p0 = j * (resolucao + 1) + i;
+			GLuint p1 = p0 + 1;
+			GLuint p2 = p0 + (resolucao + 1);
+			GLuint p3 = p2 + 1;
+
+			// Ensure correct face orientation (CCW order)
+			Indices.push_back(glm::ivec3{ p0, p2, p3 });
+			Indices.push_back(glm::ivec3{ p0, p3, p1 });
+		}
+	}
+
+	// === Add center vertices for the base and top ===
 	GLuint topoIndex = Vertices.size();
 	Vertices.push_back(Vertice{ Centro + glm::vec3{0.0f, altura / 2.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{1.0f, 1.0f, 1.0f}, glm::vec2{0.5f, 1.0f} });
 
-	// Bottom center vertex
 	GLuint baseIndex = Vertices.size();
 	Vertices.push_back(Vertice{ Centro + glm::vec3{0.0f, -altura / 2.0f, 0.0f}, glm::vec3{0.0f, -1.0f, 0.0f}, glm::vec3{1.0f, 1.0f, 1.0f}, glm::vec2{0.5f, 0.0f} });
 
-	// Generate side faces
+	// === Generate top and bottom faces ===
 	for (GLuint i = 0; i < resolucao; ++i) {
-		GLuint p0 = i * 2;
-		GLuint p1 = (i + 1) * 2;
-		GLuint p2 = p1 + 1;
-		GLuint p3 = p0 + 1;
+		GLuint p0 = i;
+		GLuint p1 = (i + 1) % resolucao;
 
-		Indices.push_back(glm::ivec3{ p0, p1, p2 });
-		Indices.push_back(glm::ivec3{ p0, p2, p3 });
-	}
+		// Top face (counterclockwise order)
+		GLuint topOffset = (numCamadas - 1) * (resolucao + 1);
+		Indices.push_back(glm::ivec3{ topoIndex, topOffset + p1, topOffset + p0 });
 
-	// Generate top and bottom faces
-	for (GLuint i = 0; i < resolucao; ++i) {
-		GLuint p0 = i * 2;
-		GLuint p1 = (i + 1) * 2;
-
-		// Top face
-		Indices.push_back(glm::ivec3{ topoIndex, p1, p0 });
-
-		// Bottom face
-		GLuint p0b = p0 + 1;
-		GLuint p1b = p1 + 1;
-		Indices.push_back(glm::ivec3{ baseIndex, p0b, p1b });
+		// Bottom face (clockwise order to match front face winding)
+		Indices.push_back(glm::ivec3{ baseIndex, p0, p1 });
 	}
 }
+
 
 GLuint CarregaCilindro(GLuint& TotalVertices, GLuint& TotalIndices, float altura, float raio, glm::vec3 Centro) {
 	std::vector<Vertice> Vertices;
 	std::vector<glm::ivec3> Triangulos;
 
-	GerarMalhaCilindro(50, altura, raio, Centro, Vertices, Triangulos);
+	GerarMalhaCilindro(500, 3, altura, raio, Centro, Vertices, Triangulos);
 
 	TotalVertices = Vertices.size();
 	TotalIndices = Triangulos.size() * 3;

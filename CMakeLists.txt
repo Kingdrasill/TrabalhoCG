@@ -5,11 +5,12 @@ cmake_minimum_required(VERSION 3.12)
 
 project(TrabalhoFinal)
 
-add_executable(TrabalhoFinal "TrabalhoFinal.cpp"  "Arquivo.cpp" "Textura.cpp" "Geometria.cpp" "Camera.cpp")
+add_executable(TrabalhoFinal "TrabalhoFinal.cpp"  "Arquivo.cpp" "Textura.cpp" "Geometria.cpp"  "dependencias/glad/src/glad.c" "Shader.h" "Camera.h")
 
 target_include_directories(TrabalhoFinal PRIVATE dependencias/glm
 												 dependencias/stb
 												 dependencias/glfw/include
+												 dependencias/glad/include
 												 dependencias/glew/include
 )
 
@@ -25,5 +26,4 @@ target_link_libraries(TrabalhoFinal PRIVATE glfw3.lib
 add_custom_command(TARGET TrabalhoFinal POST_BUILD
 				   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/dependencias/glew/bin/Release/x64/glew32.dll" "${CMAKE_BINARY_DIR}"
 )
-
 # TODO: Adicione testes e instale destinos, se necessário.

@@ -1,49 +1,25 @@
 ﻿#include "TrabalhoFinal.h"
 
-int Width = 800;
-int Height = 600;
+void Resize(GLFWwindow* window, int Width, int Height);
 
-FlyCamera Camera;
+void ProcessInput(GLFWwindow* window);
 
-glm::vec2 PosicaoAnteriorCursor;
-bool habilitarMovimentoMouse = false;
+void MouseCallback(GLFWwindow* Window, double xposIn, double yposIn);
 
-void MouseButtonCallback(GLFWwindow* Window, int Button, int Action, int Modifiers) {
-	if (Button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (Action == GLFW_PRESS) {
-			glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+void ScrollCallback(GLFWwindow* Window, double xoffset, double yoffset);
 
-			double X, Y;
-			glfwGetCursorPos(Window, &X, &Y);
+int Width = 1024;
+int Height = 576;
 
-			PosicaoAnteriorCursor = glm::vec2{ X, Y };
-			habilitarMovimentoMouse = true;
-		}
-		else if (Action == GLFW_RELEASE) {
-			glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-			habilitarMovimentoMouse = false;
-		}
-	}
-}
+Camera camera(glm::vec3(0.0f,0.0f,3.0f));
+float lastX = Width / 2.0f;
+float lastY = Height / 2.0f;
+bool firstMouse = true;
 
-void MouseMotionCallback(GLFWwindow* Window, double X, double Y) {
-	if (habilitarMovimentoMouse) {
-		glm::vec2 PosicaoAtualCursor{ X,Y };
-		glm::vec2 Delta = PosicaoAnteriorCursor - PosicaoAtualCursor;
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
-		Camera.OlharPara(-Delta.x, -Delta.y);
-		PosicaoAnteriorCursor = PosicaoAtualCursor;
-	}
-}
-
-void Resize(GLFWwindow* window, int NovaLargura, int NovaAltura) {
-	int Width = NovaLargura;
-	int Height = NovaAltura;
-
-	Camera.AspectRatio = static_cast<float>(Width) / Height;
-
-	glViewport(0, 0, Width, Height);
-}
+glm::vec3 LightPos(0.0f, 4.0f, 0.0f);
 
 int main() {
 	setlocale(LC_ALL, "pt_BR");
@@ -53,146 +29,169 @@ int main() {
 	assert(window);
 
 	glfwMakeContextCurrent(window);
-	glfwSetMouseButtonCallback(window, MouseButtonCallback);
-	glfwSetCursorPosCallback(window, MouseMotionCallback);
 	glfwSetFramebufferSizeCallback(window, Resize);
+	glfwSetCursorPosCallback(window, MouseCallback);
+	glfwSetScrollCallback(window, ScrollCallback);
 
-	int statusGlwInit = glewInit();
-	assert(glewInit() == GLEW_OK);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	GLint GLMajorVersion = 0;
-	GLint GLMinorVersion = 0;
-
-	glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
-	glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
-
-	std::cout << "Maior versão do OpenGL suportada: " << GLMajorVersion << std::endl;
-	std::cout << "Menor versão do OpenGL suportada: " << GLMinorVersion << std::endl;
-
-	std::cout << "Fabricante do driver de video: " << glGetString(GL_VENDOR) << std::endl;
-	//std::cout << "Modelo da place de video: " << glGetString(GL_RENDER) << std::endl;
-	std::cout << "Versão do OpenGL: " << glGetString(GL_VERSION) << std::endl;
-	std::cout << "Versão do GLS: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		std::cerr << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
 
 	Resize(window, Width, Height);
 
-	GLuint ProgramaId = LoadShaders("shaders/triangle_vert.glsl", "shaders/triangle_frag.glsl");
-	GLuint TexturaId = CarregarTextura("textures/mundo.jpg");
-	GLuint TexturaNuvemId = CarregarTextura("textures/nuvem.jpg");
-
-	//GLuint QuadVAO = CarregaGeometria();
-
-	GLuint EsferaTotalVertices = 0;
-	GLuint EsferaTotalIndices = 0;
-	GLuint EsferaVAO = CarregaEsfera(EsferaTotalVertices, EsferaTotalIndices, 1, glm::vec3{ 0.0f,0.0f,0.0f });
-	std::cout << "Total de vertices da esfera: " << EsferaTotalVertices << std::endl;
-	std::cout << "Total de indices da esfera: " << EsferaTotalIndices << std::endl;
-
-	GLuint CilindroTotalVertices = 0;
-	GLuint CilindroTotalIndices = 0;
-	GLuint CilindroVAO = CarregaCilindro(CilindroTotalVertices, CilindroTotalIndices, 2, 1, glm::vec3{ 2.0f,0.0f,0.0f });
-	std::cout << "Total de vertices da esfera: " << CilindroTotalVertices << std::endl;
-	std::cout << "Total de indices da esfera: " << CilindroTotalIndices << std::endl;
-
-	glm::mat4 MatrizIdentidade = glm::identity<glm::mat4>();
-	constexpr float AnguloDeRotacao = glm::radians(90.0);
-	glm::vec3 EixoRotacao{ 1,0,0 };
-	glm::mat4 MatrizModel = glm::rotate(MatrizIdentidade, AnguloDeRotacao, EixoRotacao);
-
-	double TempoAtualAtulizadoFrameAnterior = glfwGetTime();
-
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
+	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	Shader LightShader("shaders/light_vert.glsl", "shaders/light_frag.glsl");
+	Shader ObjectShader("shaders/triangle_vert.glsl", "shaders/triangle_frag.glsl");
+	
+	GLuint TexturaId = CarregarTextura("textures/mundo.jpg");
+	GLuint TexturaNuvemId = CarregarTextura("textures/nuvem.jpg");
+	//GLuint QuadVAO = CarregaGeometria();
 
-	LuzDirecional Luz;
-	Luz.Direcao = glm::vec3{ 0.0f,0.0f,-1.0f };
-	Luz.Intensidade = 1.0f;
+	GLuint LETV = 0;
+	GLuint LETI = 0;
+	GLuint LEVAO = CarregaEsfera(LETV, LETI, 0.5, LightPos);
+	std::cout << "Total de vertices da esfera: " << LETV << std::endl;
+	std::cout << "Total de indices da esfera: " << LETI << std::endl;
+
+	GLuint OETV = 0;
+	GLuint OETI = 0;
+	GLuint OEVAO = CarregaEsfera(OETV, OETI, 1, glm::vec3{ 0.0f,0.0f,0.0f });
+	std::cout << "Total de vertices da esfera: " << OETV << std::endl;
+	std::cout << "Total de indices da esfera: " << OETI << std::endl;
+
+	GLuint OCTV = 0;
+	GLuint OCTI = 0;
+	GLuint OCVAO = CarregaCilindro(OCTV, OCTI, 10, 1, glm::vec3{ 2.0f,0.0f,0.0f });
+	std::cout << "Total de vertices da esfera: " << OCTV << std::endl;
+	std::cout << "Total de indices da esfera: " << OCTI << std::endl;
+
+	glm::mat4 Model = glm::mat4(1.0f);
+	constexpr float AnguloDeRotacao = glm::radians(90.0);
+	glm::vec3 EixoRotacao{ 1,0,0 };
+	glm::mat4 Transform = glm::rotate(Model, AnguloDeRotacao, EixoRotacao);
+
+	ObjectShader.Use();
+	ObjectShader.setInt("material.diffuse", 0);
 
 	while (!glfwWindowShouldClose(window)) {
-		double TempoAtualizadoFrameAtual = glfwGetTime();
-		double DeltaTime = TempoAtualizadoFrameAtual - TempoAtualAtulizadoFrameAnterior;
-		if (DeltaTime > 0) {
-			TempoAtualAtulizadoFrameAnterior = TempoAtualizadoFrameAtual;
-		}
+		float currentFrame = static_cast<float>(glfwGetTime());
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
 
-		Luz.Direcao = Camera.Direction;
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		glUseProgram(ProgramaId);
-
-		glm::mat4 MatrizNormal = glm::inverse(glm::transpose(Camera.GetView() * MatrizModel));
-		glm::mat4 MatrizViewProjection = Camera.GetViewProjection();
-		glm::mat4 ModelViewProjection = MatrizViewProjection * MatrizModel;
-
-		GLint TimeLoc = glGetUniformLocation(ProgramaId, "Time");
-		glUniform1f(TimeLoc, TempoAtualizadoFrameAtual);
-
-		GLint ModelViewProjectionLoc = glGetUniformLocation(ProgramaId, "ModelViewProjection");
-		glUniformMatrix4fv(ModelViewProjectionLoc, 1, GL_FALSE, glm::value_ptr(ModelViewProjection));
-
-		GLint MatrizNormalLoc = glGetUniformLocation(ProgramaId, "MatrizNormal");
-		glUniformMatrix4fv(MatrizNormalLoc, 1, GL_FALSE, glm::value_ptr(MatrizNormal));
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TexturaId);
-
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, TexturaNuvemId);
-
-		GLint TextureSamplerLoc = glGetUniformLocation(ProgramaId, "TextureSampler");
-		glUniform1i(TextureSamplerLoc, 0);
-
-		GLint TextureNuvemSamplerLoc = glGetUniformLocation(ProgramaId, "NuvemTextureSampler");
-		glUniform1i(TextureNuvemSamplerLoc, 1);
-
-		GLint DirezaoLuzLoc = glGetUniformLocation(ProgramaId, "DirecaoLuz");
-		glUniform3fv(DirezaoLuzLoc, 1, glm::value_ptr(Camera.GetView() * glm::vec4{ Luz.Direcao, 0.0f }));
-
-		GLint IntensidadeLuzLoc = glGetUniformLocation(ProgramaId, "IntensidadeLuz");
-		glUniform1f(IntensidadeLuzLoc, Luz.Intensidade);
-
-		GLint CameraPosLoc = glGetUniformLocation(ProgramaId, "CameraPos");
-		glUniform3fv(CameraPosLoc, 1, glm::value_ptr(Camera.Direction));
+		ProcessInput(window);
 
 		glPointSize(10.0f);
 		glLineWidth(10.0f);
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		glBindVertexArray(EsferaVAO);
-		glDrawElements(GL_TRIANGLES, EsferaTotalIndices, GL_UNSIGNED_INT, nullptr);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glBindVertexArray(CilindroVAO);
-		glDrawElements(GL_TRIANGLES, CilindroTotalIndices, GL_UNSIGNED_INT, nullptr);
+		ObjectShader.Use();
+		ObjectShader.setVec3("light.position", camera.Position);
+		ObjectShader.setVec3("light.direction", camera.Front);
+		ObjectShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+		ObjectShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+		ObjectShader.setVec3("ViewPos", camera.Position);
+
+		// Adicionando Objetos
+		ObjectShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+		ObjectShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+		ObjectShader.setVec3("light.specular", 1.0f,1.0f,1.0f);
+
+		ObjectShader.setFloat("light.constant", 1.0f);
+		ObjectShader.setFloat("light.linear", 0.09f);
+		ObjectShader.setFloat("light.quadratic", 0.032f);
+
+		ObjectShader.setVec3("material.specular", 1.0f, 1.0f, 1.0f);
+		ObjectShader.setFloat("material.shininess", 64.0f);
+
+		glm::mat4 Projection = glm::perspective(glm::radians(camera.Zoom), (float)Width / (float)Height, 0.1f, 10000.0f);
+		glm::mat4 View = camera.GetViewMatrix();
+		
+		ObjectShader.setMat4("Projection", Projection);
+		ObjectShader.setMat4("View", View);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, TexturaId);
+
+		glBindVertexArray(OEVAO);
+		ObjectShader.setMat4("Model", Transform);
+		glDrawElements(GL_TRIANGLES, OETI, GL_UNSIGNED_INT, nullptr);
+
+		glBindVertexArray(OCVAO);
+		ObjectShader.setMat4("Model", Model);
+		glDrawElements(GL_TRIANGLES, OCTI, GL_UNSIGNED_INT, nullptr);
+
+	   // Adicionado Luz Objeto
+		LightShader.Use();
+		LightShader.setMat4("Projection", Projection);
+		LightShader.setMat4("View", View);
+		LightShader.setVec3("LightColor", 1.0f,1.0f,1.0f);
+
+		glBindVertexArray(LEVAO);
+		LightShader.setMat4("Model", Model);
+		glDrawElements(GL_TRIANGLES, LETI, GL_UNSIGNED_INT, nullptr);
 
 		glBindVertexArray(0);
 		glUseProgram(0);
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
-
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-			Camera.MoverParaFrente(1.0f * DeltaTime);
-		}
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-			Camera.MoverParaFrente(-1.0f * DeltaTime);
-		}
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-			Camera.MoverParaDireita(-1.0f * DeltaTime);
-		}
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-			Camera.MoverParaDireita(1.0f * DeltaTime);
-		}
 	}
 
-	glDeleteBuffers(1, &EsferaVAO);
-	glDeleteBuffers(1, &CilindroVAO);
+	glDeleteBuffers(1, &OEVAO);
+	glDeleteBuffers(1, &OCVAO);
+	glDeleteBuffers(1, &LEVAO);
 	glfwTerminate();
 	return 0;
+}
+
+void Resize(GLFWwindow* window, int Width, int Height) {
+	glViewport(0, 0, Width, Height);
+}
+
+void ProcessInput(GLFWwindow* window) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.ProcressKeyboard(FOWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.ProcressKeyboard(BACKWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.ProcressKeyboard(LEFT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.ProcressKeyboard(RIGHT, deltaTime);
+}
+
+void MouseCallback(GLFWwindow* Window, double xposIn, double yposIn) {
+	float xpos = static_cast<float>(xposIn);
+	float ypos = static_cast<float>(yposIn);
+
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+	lastX = xpos;
+	lastY = ypos;
+
+	camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+void ScrollCallback(GLFWwindow* Window, double xoffset, double yoffset) {
+	camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
