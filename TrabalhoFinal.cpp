@@ -48,26 +48,26 @@ int main() {
 	Shader ObjectShader("shaders/triangle_vert.glsl", "shaders/triangle_frag.glsl");
 
 	GLuint TexturaId = CarregarTextura("textures/mundo.jpg");
-	GLuint TexturaNuvemId = CarregarTextura("textures/nuvem.jpg");
-	//GLuint QuadVAO = CarregaGeometria();
 
 	GLuint LETV = 0;
 	GLuint LETI = 0;
 	GLuint LEVAO = CarregaEsfera(LETV, LETI, 0.5, LightPos);
-	std::cout << "Total de vertices da esfera: " << LETV << std::endl;
-	std::cout << "Total de indices da esfera: " << LETI << std::endl;
+
+	GLuint OQTV = 0;
+	GLuint OQTI = 0;
+	GLuint OQVAO = CarregaQuadrilatero(OQTV, OQTI, 1.0f, 1.0f, 1.0f, glm::vec3(-2.0f, 0.0f, 0.0f));
+
+	GLuint OESTV = 0;
+	GLuint OESTI = 0;
+	GLuint OESVAO = CarregaEscada(OESTV, OESTI, 5, 1.0f, 1.0f, 1.0f, glm::vec3(-5.0f, 0.0f, 0.0f));
 
 	GLuint OETV = 0;
 	GLuint OETI = 0;
 	GLuint OEVAO = CarregaEsfera(OETV, OETI, 1, glm::vec3{ 0.0f,0.0f,0.0f });
-	std::cout << "Total de vertices da esfera: " << OETV << std::endl;
-	std::cout << "Total de indices da esfera: " << OETI << std::endl;
 
 	GLuint OCTV = 0;
 	GLuint OCTI = 0;
-	GLuint OCVAO = CarregaCilindro(OCTV, OCTI, 10, 1, glm::vec3{ 2.0f,0.0f,0.0f });
-	std::cout << "Total de vertices da esfera: " << OCTV << std::endl;
-	std::cout << "Total de indices da esfera: " << OCTI << std::endl;
+	GLuint OCVAO = CarregaCilindro(OCTV, OCTI, 10, 5, 1, glm::vec3{ 2.0f,0.0f,0.0f });
 
 	glm::mat4 Model = glm::mat4(1.0f);
 	constexpr float AnguloDeRotacao = glm::radians(90.0);
@@ -84,7 +84,7 @@ int main() {
 		glm::vec3(0.5f, 0.5f, 0.5f)
 	);
 
-	PointLight pl1(glm::vec3(0.7f, 0.2f, 2.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
+	PointLight pl1(glm::vec3(100.0f, 100.0f, 100.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
 	PointLight pl2(glm::vec3(2.3f, -3.3f, -4.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
 	PointLight pl3(glm::vec3(-4.0f, 2.0f, -12.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
 	PointLight pl4(glm::vec3(0.0f, 0.0f, -3.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
@@ -92,11 +92,11 @@ int main() {
 	SpotLight sl(
 		camera.Position,
 		camera.Front,
-		glm::cos(glm::radians(12.5f)),
-		glm::cos(glm::radians(15.0f)),
+		glm::cos(glm::radians(25.0f)),
+		glm::cos(glm::radians(27.5f)),
 		1.0f,
 		0.09f,
-		0.0032f,
+		0.008f,
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f)
@@ -127,9 +127,6 @@ int main() {
 
 		// Luz Pontuais
 		pl1.setToShader(&ObjectShader, 0);
-		pl2.setToShader(&ObjectShader, 1);
-		pl3.setToShader(&ObjectShader, 2);
-		pl4.setToShader(&ObjectShader, 3);
 
 		// Lanterna
 		sl.updateCameraValues(camera.Position, camera.Front);
@@ -143,6 +140,14 @@ int main() {
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TexturaId);
+
+		glBindVertexArray(OQVAO);
+		ObjectShader.setMat4("Model", Model);
+		glDrawElements(GL_TRIANGLES, OQTI, GL_UNSIGNED_INT, nullptr);
+
+		glBindVertexArray(OESVAO);
+		ObjectShader.setMat4("Model", Model);
+		glDrawElements(GL_TRIANGLES, OESTI, GL_UNSIGNED_INT, nullptr);
 
 		glBindVertexArray(OEVAO);
 		ObjectShader.setMat4("Model", Transform);

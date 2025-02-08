@@ -1,49 +1,81 @@
 #include "TrabalhoFinal.h"
 
-GLuint CarregaGeometria() {
-	std::array<Vertice, 6> Quadrado = {
-		Vertice{
-			glm::vec3{-1.0f,-1.0f,0.0f},
-			glm::vec3{0.0f,0.0f,1.0f},
-			glm::vec3{1.0f,0.0f,0.0f},
-			glm::vec2{0.0f,0.0f}
-		},
-		Vertice{
-			glm::vec3{1.0f,-1.0f,0.0f},
-			glm::vec3{0.0f,0.0f,1.0f},
-			glm::vec3{0.0f,1.0f,0.0f},
-			glm::vec2{1.0f,0.0f}
-		},
-		Vertice{
-			glm::vec3{1.0f,1.0f,0.0f},
-			glm::vec3{0.0f,0.0f,1.0f},
-			glm::vec3{1.0f,0.0f,0.0f},
-			glm::vec2{1.0f,1.0f}
-		},
-		Vertice{
-			glm::vec3{-1.0f,1.0f,0.0f},
-			glm::vec3{0.0f,0.0f,1.0f},
-			glm::vec3{0.0f,0.0f,1.0f},
-			glm::vec2{0.0f,1.0f}
+void GerarMalhaQuadrilatero(GLuint resolucao, float xsize, float ysize, float zsize, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices) {
+	Vertices.clear();
+	Indices.clear();
+
+	struct Face {
+		glm::vec3 normal;
+		glm::vec3 offset;
+		glm::vec3 right;
+		glm::vec3 up;
+	};
+
+	std::vector<Face> faces = {
+		{{0, 0, 1}, {0, 0, zsize / 2}, {xsize, 0, 0}, {0, ysize, 0}},  // Front
+		{{0, 0, -1}, {0, 0, -zsize / 2}, {-xsize, 0, 0}, {0, ysize, 0}}, // Back
+		{{1, 0, 0}, {xsize / 2, 0, 0}, {0, 0, -zsize}, {0, ysize, 0}},  // Right
+		{{-1, 0, 0}, {-xsize / 2, 0, 0}, {0, 0, zsize}, {0, ysize, 0}}, // Left
+		{{0, 1, 0}, {0, ysize / 2, 0}, {xsize, 0, 0}, {0, 0, -zsize}},  // Top
+		{{0, -1, 0}, {0, -ysize / 2, 0}, {xsize, 0, 0}, {0, 0, zsize}}, // Bottom
+	};
+
+	GLuint vertexOffset = 0;
+
+	for (const auto& face : faces) {
+		const float dx = 1.0f / (resolucao - 1);
+		const float dy = 1.0f / (resolucao - 1);
+
+		for (GLuint i = 0; i < resolucao; ++i) {
+			for (GLuint j = 0; j < resolucao; ++j) {
+				glm::vec3 posicao = Centro + face.offset
+					+ (i * dx - 0.5f) * face.right
+					+ (j * dy - 0.5f) * face.up;
+
+				glm::vec2 texCoord = glm::vec2(i * dx, j * dy);
+
+				Vertices.push_back({ posicao, face.normal, glm::vec3(1.0f), texCoord });
+			}
 		}
-	};
 
-	std::array<glm::ivec3, 2> Indices = {
-		glm::ivec3{0, 1, 3},
-		glm::ivec3{3, 1, 2}
-	};
+		for (GLuint i = 0; i < resolucao - 1; ++i) {
+			for (GLuint j = 0; j < resolucao - 1; ++j) {
+				GLuint P0 = vertexOffset + i + j * resolucao;
+				GLuint P1 = vertexOffset + (i + 1) + j * resolucao;
+				GLuint P2 = vertexOffset + (i + 1) + (j + 1) * resolucao;
+				GLuint P3 = vertexOffset + i + (j + 1) * resolucao;
 
-	GLuint VertexBufer;
-	glGenBuffers(1, &VertexBufer);
+				Indices.push_back(glm::ivec3{ P0, P1, P3 });
+				Indices.push_back(glm::ivec3{ P3, P1, P2 });
+			}
+		}
+
+		vertexOffset += resolucao * resolucao;
+	}
+}
+
+GLuint CarregaQuadrilatero(GLuint& TotalVertices, GLuint& TotalIndices, float xsize, float ysize, float zsize, glm::vec3 Centro) {
+	std::vector<Vertice> Vertices;
+	std::vector<glm::ivec3> Triangulos;
+
+	GerarMalhaQuadrilatero(10, xsize, ysize, zsize, Centro, Vertices, Triangulos);
+
+	TotalVertices = Vertices.size();
+	TotalIndices = Triangulos.size() * 3;
+
+	GLuint VertexBuffer;
+	glGenBuffers(1, &VertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
+
+	GLsizeiptr size = Vertices.size() * sizeof(Vertice);
+	glBufferData(GL_ARRAY_BUFFER, size, Vertices.data(), GL_STATIC_DRAW);
 
 	GLuint ElementBuffer;
 	glGenBuffers(1, &ElementBuffer);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VertexBufer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Quadrado), Quadrado.data(), GL_STATIC_DRAW);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices.data(), GL_STATIC_DRAW);
+
+	GLsizeiptr sizeIndice = TotalIndices * sizeof(GLuint);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeIndice, Triangulos.data(), GL_STATIC_DRAW);
 
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
@@ -54,7 +86,7 @@ GLuint CarregaGeometria() {
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VertexBufer);
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertice),
@@ -233,11 +265,118 @@ void GerarMalhaCilindro(GLuint resolucao, GLuint numCamadas, float altura, float
 }
 
 
-GLuint CarregaCilindro(GLuint& TotalVertices, GLuint& TotalIndices, float altura, float raio, glm::vec3 Centro) {
+GLuint CarregaCilindro(GLuint& TotalVertices, GLuint& TotalIndices, GLuint numCamadas, float altura, float raio, glm::vec3 Centro) {
 	std::vector<Vertice> Vertices;
 	std::vector<glm::ivec3> Triangulos;
 
-	GerarMalhaCilindro(500, 3, altura, raio, Centro, Vertices, Triangulos);
+	GerarMalhaCilindro(50, numCamadas, altura, raio, Centro, Vertices, Triangulos);
+
+	TotalVertices = Vertices.size();
+	TotalIndices = Triangulos.size() * 3;
+
+	GLuint VertexBuffer;
+	glGenBuffers(1, &VertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
+
+	GLsizeiptr size = Vertices.size() * sizeof(Vertice);
+	glBufferData(GL_ARRAY_BUFFER, size, Vertices.data(), GL_STATIC_DRAW);
+
+	GLuint ElementBuffer;
+	glGenBuffers(1, &ElementBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
+
+	GLsizeiptr sizeIndice = TotalIndices * sizeof(GLuint);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeIndice, Triangulos.data(), GL_STATIC_DRAW);
+
+	GLuint VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertice),
+		nullptr);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(Vertice),
+		reinterpret_cast<void*>(offsetof(Vertice, Normal)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_TRUE, sizeof(Vertice),
+		reinterpret_cast<void*>(offsetof(Vertice, Cor)));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_TRUE, sizeof(Vertice),
+		reinterpret_cast<void*>(offsetof(Vertice, UV)));
+
+	glBindVertexArray(0);
+
+	return VAO;
+}
+
+void GerarMalhaEscada(GLuint numdegrau, float xdegrau, float ydegrau, float zdegrau, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices) {
+	Vertices.clear();
+	Indices.clear();
+
+	GLuint vertexOffset = 0;
+
+	for (GLuint step = 0; step < numdegrau; ++step) {
+		float stepY = step * ydegrau;
+		float stepZ = step * zdegrau;
+
+		glm::vec3 stepCenter = Centro + glm::vec3(0, stepY, -stepZ);
+
+		// Each step is a cuboid (like the quadrilateral function but for one step)
+		struct Face {
+			glm::vec3 normal;
+			glm::vec3 offset;
+			glm::vec3 right;
+			glm::vec3 up;
+		};
+
+		std::vector<Face> faces = {
+			{{0, 0, 1}, {0, 0, zdegrau / 2}, {xdegrau, 0, 0}, {0, ydegrau, 0}},  // Front
+			{{0, 0, -1}, {0, 0, -zdegrau / 2}, {-xdegrau, 0, 0}, {0, ydegrau, 0}}, // Back
+			{{1, 0, 0}, {xdegrau / 2, 0, 0}, {0, 0, -zdegrau}, {0, ydegrau, 0}},  // Right
+			{{-1, 0, 0}, {-xdegrau / 2, 0, 0}, {0, 0, zdegrau}, {0, ydegrau, 0}}, // Left
+			{{0, 1, 0}, {0, ydegrau / 2, 0}, {xdegrau, 0, 0}, {0, 0, -zdegrau}},  // Top
+			{{0, -1, 0}, {0, -ydegrau / 2, 0}, {xdegrau, 0, 0}, {0, 0, zdegrau}}, // Bottom
+		};
+
+		for (const auto& face : faces) {
+			float dx = 1.0f, dy = 1.0f;
+
+			for (GLuint i = 0; i < 2; ++i) {
+				for (GLuint j = 0; j < 2; ++j) {
+					glm::vec3 posicao = stepCenter + face.offset
+						+ (i * dx - 0.5f) * face.right
+						+ (j * dy - 0.5f) * face.up;
+
+					glm::vec2 texCoord = glm::vec2(i, j);
+
+					Vertices.push_back({ posicao, face.normal, glm::vec3(1.0f), texCoord });
+				}
+			}
+
+			// Generate indices for each face
+			GLuint P0 = vertexOffset;
+			GLuint P1 = vertexOffset + 1;
+			GLuint P2 = vertexOffset + 3;
+			GLuint P3 = vertexOffset + 2;
+
+			Indices.push_back(glm::ivec3{ P0, P1, P3 });
+			Indices.push_back(glm::ivec3{ P3, P1, P2 });
+
+			vertexOffset += 4;
+		}
+	}
+}
+
+GLuint CarregaEscada(GLuint& TotalVertices, GLuint& TotalIndices, GLuint numdegrau, float xdegrau, float ydegrau, float zdegrau, glm::vec3 Centro) {
+	std::vector<Vertice> Vertices;
+	std::vector<glm::ivec3> Triangulos;
+
+	GerarMalhaEscada(numdegrau, xdegrau, ydegrau, zdegrau, Centro, Vertices, Triangulos);
 
 	TotalVertices = Vertices.size();
 	TotalIndices = Triangulos.size() * 3;
