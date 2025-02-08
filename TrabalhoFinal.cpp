@@ -43,12 +43,10 @@ int main() {
 	Resize(window, Width, Height);
 
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
 
 	Shader LightShader("shaders/light_vert.glsl", "shaders/light_frag.glsl");
 	Shader ObjectShader("shaders/triangle_vert.glsl", "shaders/triangle_frag.glsl");
-	
+
 	GLuint TexturaId = CarregarTextura("textures/mundo.jpg");
 	GLuint TexturaNuvemId = CarregarTextura("textures/nuvem.jpg");
 	//GLuint QuadVAO = CarregaGeometria();
@@ -71,13 +69,6 @@ int main() {
 	std::cout << "Total de vertices da esfera: " << OCTV << std::endl;
 	std::cout << "Total de indices da esfera: " << OCTI << std::endl;
 
-	glm::vec3 pointLightPositions[] = {
-		glm::vec3(0.7f,  0.2f,  2.0f),
-		glm::vec3(2.3f, -3.3f, -4.0f),
-		glm::vec3(-4.0f,  2.0f, -12.0f),
-		glm::vec3(0.0f,  0.0f, -3.0f)
-	};
-
 	glm::mat4 Model = glm::mat4(1.0f);
 	constexpr float AnguloDeRotacao = glm::radians(90.0);
 	glm::vec3 EixoRotacao{ 1,0,0 };
@@ -85,6 +76,31 @@ int main() {
 
 	ObjectShader.Use();
 	ObjectShader.setInt("material.diffuse", 0);
+
+	DirectionalLight dl(
+		glm::vec3(-0.2f, -1.0f, -0.3f),
+		glm::vec3(0.05f, 0.05f, 0.05f),
+		glm::vec3(0.4f, 0.4f, 0.4f),
+		glm::vec3(0.5f, 0.5f, 0.5f)
+	);
+
+	PointLight pl1(glm::vec3(0.7f, 0.2f, 2.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
+	PointLight pl2(glm::vec3(2.3f, -3.3f, -4.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
+	PointLight pl3(glm::vec3(-4.0f, 2.0f, -12.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
+	PointLight pl4(glm::vec3(0.0f, 0.0f, -3.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
+
+	SpotLight sl(
+		camera.Position,
+		camera.Front,
+		glm::cos(glm::radians(12.5f)),
+		glm::cos(glm::radians(15.0f)),
+		1.0f,
+		0.09f,
+		0.0032f,
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f)
+	);
 
 	while (!glfwWindowShouldClose(window)) {
 		float currentFrame = static_cast<float>(glfwGetTime());
@@ -107,58 +123,17 @@ int main() {
 		ObjectShader.setFloat("material.shininess", 32.0f);
 
 		// Luz Direcional
-		ObjectShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-		ObjectShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-		ObjectShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-		ObjectShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+		dl.setToShader(&ObjectShader);
 
-		// Luz Pontual 1
-		ObjectShader.setVec3("pointLights[0].position", pointLightPositions[0]);
-		ObjectShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-		ObjectShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-		ObjectShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-		ObjectShader.setFloat("pointLights[0].constant", 1.0f);
-		ObjectShader.setFloat("pointLights[0].linear", 0.09f);
-		ObjectShader.setFloat("pointLights[0].quadratic", 0.032f);
-
-		// Luz Pontual 2
-		ObjectShader.setVec3("pointLights[1].position", pointLightPositions[1]);
-		ObjectShader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
-		ObjectShader.setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
-		ObjectShader.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
-		ObjectShader.setFloat("pointLights[1].constant", 1.0f);
-		ObjectShader.setFloat("pointLights[1].linear", 0.09f);
-		ObjectShader.setFloat("pointLights[1].quadratic", 0.032f);
-
-		// Luz Pontual 3
-		ObjectShader.setVec3("pointLights[2].position", pointLightPositions[2]);
-		ObjectShader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
-		ObjectShader.setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
-		ObjectShader.setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
-		ObjectShader.setFloat("pointLights[2].constant", 1.0f);
-		ObjectShader.setFloat("pointLights[2].linear", 0.09f);
-		ObjectShader.setFloat("pointLights[2].quadratic", 0.032f);
-
-		// Luz Pontual 4
-		ObjectShader.setVec3("pointLights[3].position", pointLightPositions[3]);
-		ObjectShader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
-		ObjectShader.setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
-		ObjectShader.setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
-		ObjectShader.setFloat("pointLights[3].constant", 1.0f);
-		ObjectShader.setFloat("pointLights[3].linear", 0.09f);
-		ObjectShader.setFloat("pointLights[3].quadratic", 0.032f);
+		// Luz Pontuais
+		pl1.setToShader(&ObjectShader, 0);
+		pl2.setToShader(&ObjectShader, 1);
+		pl3.setToShader(&ObjectShader, 2);
+		pl4.setToShader(&ObjectShader, 3);
 
 		// Lanterna
-		ObjectShader.setVec3("spotLight.position", camera.Position);
-		ObjectShader.setVec3("spotLight.direction", camera.Front);
-		ObjectShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
-		ObjectShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
-		ObjectShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
-		ObjectShader.setFloat("spotLight.constant", 1.0f);
-		ObjectShader.setFloat("spotLight.linear", 0.09f);
-		ObjectShader.setFloat("spotLight.quadratic", 0.032f);
-		ObjectShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-		ObjectShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+		sl.updateCameraValues(camera.Position, camera.Front);
+		sl.setToShader(&ObjectShader);
 
 		glm::mat4 Projection = glm::perspective(glm::radians(camera.Zoom), (float)Width / (float)Height, 0.1f, 10000.0f);
 		glm::mat4 View = camera.GetViewMatrix();

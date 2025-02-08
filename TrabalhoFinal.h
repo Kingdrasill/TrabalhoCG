@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Shader.h"
+#include "Light.h"
 #include "Camera.h"
 
 #include <array>

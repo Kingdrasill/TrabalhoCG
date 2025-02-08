@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project(TrabalhoFinal)
 
-add_executable(TrabalhoFinal "TrabalhoFinal.cpp"  "Arquivo.cpp" "Textura.cpp" "Geometria.cpp"  "dependencias/glad/src/glad.c" "Shader.h" "Camera.h")
+add_executable(TrabalhoFinal "TrabalhoFinal.cpp"  "Arquivo.cpp" "Textura.cpp" "Geometria.cpp"  "dependencias/glad/src/glad.c" "Shader.h" "Camera.h" "Light.h")
 
 target_include_directories(TrabalhoFinal PRIVATE dependencias/glm
 												 dependencias/stb
