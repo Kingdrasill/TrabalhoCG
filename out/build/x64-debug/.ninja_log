@@ -1,0 +1,10 @@
+# ninja log v5
+27	523	7605988585239067	CMakeFiles/TrabalhoFinal.dir/TrabalhoFinal.cpp.obj	cb150d4d0d44c85e
+524	660	7605988586025320	TrabalhoFinal.exe	c86e82c422a9babb
+40	550	7605987409037821	CMakeFiles/TrabalhoFinal.dir/Geometria.cpp.obj	987a04c37388868d
+30	486	7605963747221494	CMakeFiles/TrabalhoFinal.dir/Window.cpp.obj	6ec46156811806a2
+37	571	7605987409145260	CMakeFiles/TrabalhoFinal.dir/Textura.cpp.obj	b15f0dcb37febbcd
+35	526	7605987408784085	CMakeFiles/TrabalhoFinal.dir/Arquivo.cpp.obj	a22e880fec573de0
+42	519	7605987408667065	CMakeFiles/TrabalhoFinal.dir/Camera.cpp.obj	87d5be614a9d1d1
+26	695	7606804837493900	CMakeFiles/TrabalhoFinal.dir/TrabalhoFinal.cpp.obj	cb150d4d0d44c85e
+695	1334	7606804839912913	TrabalhoFinal.exe	c86e82c422a9babb
