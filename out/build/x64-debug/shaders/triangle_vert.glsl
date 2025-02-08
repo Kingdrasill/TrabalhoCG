@@ -15,7 +15,6 @@ out vec3 FragPos;
 
 void main(){
 	FragPos = vec3(Model * vec4(InPosition, 1.0));
-
 	Normal = mat3(transpose(inverse(Model))) * InNormal;
 	UV = InUV;
 
