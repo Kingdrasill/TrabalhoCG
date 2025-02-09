@@ -50,39 +50,31 @@ int main() {
 	GLuint TexturaMundoId = CarregarTextura("textures/mundo.jpg");
 	GLuint TexturaNuvemId = CarregarTextura("textures/nuvem.jpg");
 	GLuint TexturaGrassId = CarregarTextura("textures/grass.jpg");
+	GLuint TexturaGramaTerrorId = CarregarTextura("textures/grass3.jpg");
+	GLuint TexturaTreeId = CarregarTextura("textures/tree.jpg");
+	GLuint TexturaFolhasId = CarregarTextura("textures/folhas2.jpg");
 
 	GLuint LETV = 0;
 	GLuint LETI = 0;
-	GLuint LEVAO = CarregaEsfera(LETV, LETI, 0.5, LightPos);
+	GLuint LEVAO = CarregaCone(LETV, LETI, 5, 1, LightPos);
 
-	Floor floor(TexturaGrassId, 1000.0f, 1.0f, 1000.0f, glm::vec3(0.0f, -2.0f, 0.0f));
+	Floor floor(TexturaGramaTerrorId, 1000.0f, 1.0f, 1000.0f, glm::vec3(0.0f, -2.0f, 0.0f));
 
-	GLuint OQTV = 0;
-	GLuint OQTI = 0;
-	GLuint OQVAO = CarregaQuadrilatero(OQTV, OQTI, 1.0f, 1.0f, 1.0f, 1.0f, glm::vec3(-2.0f, 0.0f, 0.0f));
+	Floor floor1(TexturaMundoId, 8.0f, 3.0f, 0.2f, glm::vec3(0.0f, 0.0f, 0.0f));
+	Floor floor2(TexturaGrassId, 1.0f, 2.0f, 0.2f, glm::vec3(0.0f, -0.5f, 0.2f));
 
-	GLuint OESTV = 0;
-	GLuint OESTI = 0;
-	GLuint OESVAO = CarregaEscada(OESTV, OESTI, 5, 1.0f, 1.0f, 1.0f, glm::vec3(-5.0f, 0.0f, 0.0f));
+	std::array<Arvore, 5> arvores;
 
-	GLuint OETV = 0;
-	GLuint OETI = 0;
-	GLuint OEVAO = CarregaEsfera(OETV, OETI, 1, glm::vec3{ 0.0f,0.0f,0.0f });
-
-	GLuint OCTV = 0;
-	GLuint OCTI = 0;
-	GLuint OCVAO = CarregaCilindro(OCTV, OCTI, 10, 5, 1, glm::vec3{ 2.0f,0.0f,0.0f });
-
-	glm::mat4 Model = glm::mat4(1.0f);
-	constexpr float AnguloDeRotacao = glm::radians(90.0);
-	glm::vec3 EixoRotacao{ 1,0,0 };
-	glm::mat4 Transform = glm::rotate(Model, AnguloDeRotacao, EixoRotacao);
+	for (int i = 0; i < 5; i++) {
+		float x = 0.25 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.75 - 0.25)));
+		arvores[i] = Arvore(TexturaTreeId, TexturaFolhasId, glm::vec3(2*i, -0.5f, 1.0f), 2, 4, x*0.8, 2*x);
+	}
 
 	ObjectShader.Use();
 	ObjectShader.setInt("material.diffuse", 0);
 
 	DirectionalLight dl(
-		glm::vec3(-0.2f, -1.0f, -0.3f),
+		glm::vec3(0.0f, -10.0f, 0.0f),
 		glm::vec3(0.05f, 0.05f, 0.05f),
 		glm::vec3(0.4f, 0.4f, 0.4f),
 		glm::vec3(0.5f, 0.5f, 0.5f)
@@ -123,8 +115,8 @@ int main() {
 
 		ObjectShader.Use();
 		ObjectShader.setVec3("ViewPos", 1.0f, 1.0f, 1.0f);
-		ObjectShader.setVec3("material.specular", 1.0f, 1.0f, 1.0f);
-		ObjectShader.setFloat("material.shininess", 32.0f);
+		ObjectShader.setVec3("material.specular", 0.0f, 0.0f, 0.0f);
+		ObjectShader.setFloat("material.shininess", 1024.0f);
 
 		// Luz Direcional
 		dl.setToShader(&ObjectShader);
@@ -141,34 +133,20 @@ int main() {
 		
 		ObjectShader.setMat4("Projection", Projection);
 		ObjectShader.setMat4("View", View);
-		
 
 		floor.Render(&ObjectShader);
+		floor1.Render(&ObjectShader);
+		floor2.Render(&ObjectShader);
 
-		glBindVertexArray(OESVAO);
-		ObjectShader.setMat4("Model", Model);
-		glDrawElements(GL_TRIANGLES, OESTI, GL_UNSIGNED_INT, nullptr);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TexturaNuvemId);
-
-		glBindVertexArray(OEVAO);
-		ObjectShader.setMat4("Model", Transform);
-		glDrawElements(GL_TRIANGLES, OETI, GL_UNSIGNED_INT, nullptr);
-
-		glBindVertexArray(OCVAO);
-		ObjectShader.setMat4("Model", Model);
-		glDrawElements(GL_TRIANGLES, OCTI, GL_UNSIGNED_INT, nullptr);
+		for (int i = 0; i < 5; i++) {
+			arvores[i].Render(&ObjectShader);
+		}
 
 	   // Adicionado Luz Objeto
 		LightShader.Use();
 		LightShader.setMat4("Projection", Projection);
 		LightShader.setMat4("View", View);
 		LightShader.setVec3("LightColor", 1.0f,1.0f,1.0f);
-
-		glBindVertexArray(LEVAO);
-		LightShader.setMat4("Model", Model);
-		glDrawElements(GL_TRIANGLES, LETI, GL_UNSIGNED_INT, nullptr);
 
 		glBindVertexArray(0);
 		glUseProgram(0);
@@ -177,8 +155,6 @@ int main() {
 		glfwSwapBuffers(window);
 	}
 
-	glDeleteBuffers(1, &OEVAO);
-	glDeleteBuffers(1, &OCVAO);
 	glDeleteBuffers(1, &LEVAO);
 	glfwTerminate();
 	return 0;

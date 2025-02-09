@@ -421,3 +421,113 @@ GLuint CarregaEscada(GLuint& TotalVertices, GLuint& TotalIndices, GLuint numdegr
 
 	return VAO;
 }
+
+void GerarMalhaCone(GLuint resolucao, float altura, float raio, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices) {
+	Vertices.clear();
+	Indices.clear();
+
+	constexpr float DoisPi = glm::two_pi<float>();
+	const float InversoResolucao = 1.0f / static_cast<float>(resolucao);
+
+	// === Gerar vértices ===
+
+	// Vértice superior do cone
+	GLuint topoIndex = 0;
+	Vertices.push_back(Vertice{
+		Centro + glm::vec3{0.0f, altura / 2.0f, 0.0f},  // Ponto no topo
+		glm::normalize(glm::vec3{0.0f, 1.0f, 0.0f}),   // Normal aproximada
+		glm::vec3{1.0f, 1.0f, 1.0f},
+		glm::vec2{0.5f, 1.0f}
+		});
+
+	// Vértices da base circular
+	for (GLuint i = 0; i < resolucao; ++i) {
+		float angulo = i * InversoResolucao * DoisPi;
+		float x = raio * glm::cos(angulo);
+		float z = raio * glm::sin(angulo);
+
+		glm::vec3 posicaoBase = Centro + glm::vec3{ x, -altura / 2.0f, z };
+		glm::vec3 normalBase = glm::normalize(glm::vec3{ x, raio / altura, z }); // Aproximação da normal
+
+		Vertices.push_back(Vertice{
+			posicaoBase,
+			normalBase,
+			glm::vec3{1.0f, 1.0f, 1.0f},
+			glm::vec2{1.0f - i * InversoResolucao, 0.0f}
+			});
+	}
+
+	// Vértice central da base (para completar a base)
+	GLuint baseCenterIndex = Vertices.size();
+	Vertices.push_back(Vertice{
+		Centro + glm::vec3{0.0f, -altura / 2.0f, 0.0f},
+		glm::vec3{0.0f, -1.0f, 0.0f},  // Normal para baixo
+		glm::vec3{1.0f, 1.0f, 1.0f},
+		glm::vec2{0.5f, 0.0f}
+		});
+
+	// === Gerar índices ===
+
+	// Conexões entre a base e o topo
+	for (GLuint i = 0; i < resolucao; ++i) {
+		GLuint p0 = i + 1;
+		GLuint p1 = (i + 1) % resolucao + 1;
+		Indices.push_back(glm::ivec3{ topoIndex, p1, p0 });  // Face lateral
+	}
+
+	// Conexões para a base
+	for (GLuint i = 0; i < resolucao; ++i) {
+		GLuint p0 = i + 1;
+		GLuint p1 = (i + 1) % resolucao + 1;
+		Indices.push_back(glm::ivec3{ baseCenterIndex, p0, p1 });  // Face da base
+	}
+}
+
+GLuint CarregaCone(GLuint& TotalVertices, GLuint& TotalIndices, float altura, float raio, glm::vec3 Centro) {
+	std::vector<Vertice> Vertices;
+	std::vector<glm::ivec3> Triangulos;
+
+	GerarMalhaCone(50, altura, raio, Centro, Vertices, Triangulos);
+
+	TotalVertices = Vertices.size();
+	TotalIndices = Triangulos.size() * 3;
+
+	GLuint VertexBuffer;
+	glGenBuffers(1, &VertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
+
+	GLsizeiptr size = Vertices.size() * sizeof(Vertice);
+	glBufferData(GL_ARRAY_BUFFER, size, Vertices.data(), GL_STATIC_DRAW);
+
+	GLuint ElementBuffer;
+	glGenBuffers(1, &ElementBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
+
+	GLsizeiptr sizeIndice = TotalIndices * sizeof(GLuint);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeIndice, Triangulos.data(), GL_STATIC_DRAW);
+
+	GLuint VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertice),
+		nullptr);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(Vertice),
+		reinterpret_cast<void*>(offsetof(Vertice, Normal)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_TRUE, sizeof(Vertice),
+		reinterpret_cast<void*>(offsetof(Vertice, Cor)));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_TRUE, sizeof(Vertice),
+		reinterpret_cast<void*>(offsetof(Vertice, UV)));
+
+	glBindVertexArray(0);
+
+	return VAO;
+}

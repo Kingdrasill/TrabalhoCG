@@ -9,6 +9,8 @@
 
 #include <array>
 #include <cassert>
+#include <random>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 

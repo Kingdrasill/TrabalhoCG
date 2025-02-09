@@ -30,4 +30,8 @@ void GerarMalhaEscada(GLuint numdegrau, float xdegrau, float ydegrau, float zdeg
 
 GLuint CarregaEscada(GLuint& TotalVertices, GLuint& TotalIndices, GLuint numdegrau, float xdegrau, float ydegrau, float zdegrau, glm::vec3 Centro);
 
+void GerarMalhaCone(GLuint resolucao, float altura, float raio, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices);
+
+GLuint CarregaCone(GLuint& TotalVertices, GLuint& TotalIndices, float altura, float raio, glm::vec3 Centro);
+
 #endif
