@@ -1,6 +1,6 @@
-#include "TrabalhoFinal.h"
+#include "Geometria.h"
 
-void GerarMalhaQuadrilatero(GLuint resolucao, float xsize, float ysize, float zsize, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices) {
+void GerarMalhaQuadrilatero(GLuint resolucao, float repeat, float xsize, float ysize, float zsize, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices) {
 	Vertices.clear();
 	Indices.clear();
 
@@ -32,7 +32,7 @@ void GerarMalhaQuadrilatero(GLuint resolucao, float xsize, float ysize, float zs
 					+ (i * dx - 0.5f) * face.right
 					+ (j * dy - 0.5f) * face.up;
 
-				glm::vec2 texCoord = glm::vec2(i * dx, j * dy);
+				glm::vec2 texCoord = glm::vec2(i * dx * repeat, j * dy * repeat);
 
 				Vertices.push_back({ posicao, face.normal, glm::vec3(1.0f), texCoord });
 			}
@@ -54,11 +54,11 @@ void GerarMalhaQuadrilatero(GLuint resolucao, float xsize, float ysize, float zs
 	}
 }
 
-GLuint CarregaQuadrilatero(GLuint& TotalVertices, GLuint& TotalIndices, float xsize, float ysize, float zsize, glm::vec3 Centro) {
+GLuint CarregaQuadrilatero(GLuint& TotalVertices, GLuint& TotalIndices, float repeat, float xsize, float ysize, float zsize, glm::vec3 Centro) {
 	std::vector<Vertice> Vertices;
 	std::vector<glm::ivec3> Triangulos;
 
-	GerarMalhaQuadrilatero(10, xsize, ysize, zsize, Centro, Vertices, Triangulos);
+	GerarMalhaQuadrilatero(10, repeat, xsize, ysize, zsize, Centro, Vertices, Triangulos);
 
 	TotalVertices = Vertices.size();
 	TotalIndices = Triangulos.size() * 3;
@@ -317,57 +317,58 @@ GLuint CarregaCilindro(GLuint& TotalVertices, GLuint& TotalIndices, GLuint numCa
 void GerarMalhaEscada(GLuint numdegrau, float xdegrau, float ydegrau, float zdegrau, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices) {
 	Vertices.clear();
 	Indices.clear();
-
 	GLuint vertexOffset = 0;
 
 	for (GLuint step = 0; step < numdegrau; ++step) {
 		float stepY = step * ydegrau;
 		float stepZ = step * zdegrau;
 
-		glm::vec3 stepCenter = Centro + glm::vec3(0, stepY, -stepZ);
+		// Generate solid steps from ground (y=0) to current step height
+		for (GLuint fillStep = 0; fillStep <= step; ++fillStep) {
+			float fillStepY = fillStep * ydegrau;
+			glm::vec3 stepCenter = Centro + glm::vec3(0, fillStepY, -stepZ);
 
-		// Each step is a cuboid (like the quadrilateral function but for one step)
-		struct Face {
-			glm::vec3 normal;
-			glm::vec3 offset;
-			glm::vec3 right;
-			glm::vec3 up;
-		};
+			// Each block is a cuboid (six faces)
+			struct Face {
+				glm::vec3 normal;
+				glm::vec3 offset;
+				glm::vec3 right;
+				glm::vec3 up;
+			};
 
-		std::vector<Face> faces = {
-			{{0, 0, 1}, {0, 0, zdegrau / 2}, {xdegrau, 0, 0}, {0, ydegrau, 0}},  // Front
-			{{0, 0, -1}, {0, 0, -zdegrau / 2}, {-xdegrau, 0, 0}, {0, ydegrau, 0}}, // Back
-			{{1, 0, 0}, {xdegrau / 2, 0, 0}, {0, 0, -zdegrau}, {0, ydegrau, 0}},  // Right
-			{{-1, 0, 0}, {-xdegrau / 2, 0, 0}, {0, 0, zdegrau}, {0, ydegrau, 0}}, // Left
-			{{0, 1, 0}, {0, ydegrau / 2, 0}, {xdegrau, 0, 0}, {0, 0, -zdegrau}},  // Top
-			{{0, -1, 0}, {0, -ydegrau / 2, 0}, {xdegrau, 0, 0}, {0, 0, zdegrau}}, // Bottom
-		};
+			std::vector<Face> faces = {
+				{{0, 0, 1}, {0, 0, zdegrau / 2}, {xdegrau, 0, 0}, {0, ydegrau, 0}},  // Front
+				{{0, 0, -1}, {0, 0, -zdegrau / 2}, {-xdegrau, 0, 0}, {0, ydegrau, 0}}, // Back
+				{{1, 0, 0}, {xdegrau / 2, 0, 0}, {0, 0, -zdegrau}, {0, ydegrau, 0}},  // Right
+				{{-1, 0, 0}, {-xdegrau / 2, 0, 0}, {0, 0, zdegrau}, {0, ydegrau, 0}}, // Left
+				{{0, 1, 0}, {0, ydegrau / 2, 0}, {xdegrau, 0, 0}, {0, 0, -zdegrau}},  // Top
+				{{0, -1, 0}, {0, -ydegrau / 2, 0}, {xdegrau, 0, 0}, {0, 0, zdegrau}}, // Bottom
+			};
 
-		for (const auto& face : faces) {
-			float dx = 1.0f, dy = 1.0f;
+			for (const auto& face : faces) {
+				float dx = 1.0f, dy = 1.0f;
+				for (GLuint i = 0; i < 2; ++i) {
+					for (GLuint j = 0; j < 2; ++j) {
+						glm::vec3 posicao = stepCenter + face.offset
+							+ (i * dx - 0.5f) * face.right
+							+ (j * dy - 0.5f) * face.up;
 
-			for (GLuint i = 0; i < 2; ++i) {
-				for (GLuint j = 0; j < 2; ++j) {
-					glm::vec3 posicao = stepCenter + face.offset
-						+ (i * dx - 0.5f) * face.right
-						+ (j * dy - 0.5f) * face.up;
-
-					glm::vec2 texCoord = glm::vec2(i, j);
-
-					Vertices.push_back({ posicao, face.normal, glm::vec3(1.0f), texCoord });
+						glm::vec2 texCoord = glm::vec2(i, j);
+						Vertices.push_back({ posicao, face.normal, glm::vec3(1.0f), texCoord });
+					}
 				}
+
+				// Generate indices for each face
+				GLuint P0 = vertexOffset;
+				GLuint P1 = vertexOffset + 1;
+				GLuint P2 = vertexOffset + 3;
+				GLuint P3 = vertexOffset + 2;
+
+				Indices.push_back(glm::ivec3{ P0, P1, P3 });
+				Indices.push_back(glm::ivec3{ P3, P1, P2 });
+
+				vertexOffset += 4;
 			}
-
-			// Generate indices for each face
-			GLuint P0 = vertexOffset;
-			GLuint P1 = vertexOffset + 1;
-			GLuint P2 = vertexOffset + 3;
-			GLuint P3 = vertexOffset + 2;
-
-			Indices.push_back(glm::ivec3{ P0, P1, P3 });
-			Indices.push_back(glm::ivec3{ P3, P1, P2 });
-
-			vertexOffset += 4;
 		}
 	}
 }

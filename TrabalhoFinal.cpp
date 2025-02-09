@@ -8,8 +8,8 @@ void MouseCallback(GLFWwindow* Window, double xposIn, double yposIn);
 
 void ScrollCallback(GLFWwindow* Window, double xoffset, double yoffset);
 
-int Width = 1024;
-int Height = 576;
+int Width = 1280;
+int Height = 720;
 
 Camera camera(glm::vec3(0.0f,0.0f,3.0f));
 float lastX = Width / 2.0f;
@@ -47,15 +47,19 @@ int main() {
 	Shader LightShader("shaders/light_vert.glsl", "shaders/light_frag.glsl");
 	Shader ObjectShader("shaders/triangle_vert.glsl", "shaders/triangle_frag.glsl");
 
-	GLuint TexturaId = CarregarTextura("textures/mundo.jpg");
+	GLuint TexturaMundoId = CarregarTextura("textures/mundo.jpg");
+	GLuint TexturaNuvemId = CarregarTextura("textures/nuvem.jpg");
+	GLuint TexturaGrassId = CarregarTextura("textures/grass.jpg");
 
 	GLuint LETV = 0;
 	GLuint LETI = 0;
 	GLuint LEVAO = CarregaEsfera(LETV, LETI, 0.5, LightPos);
 
+	Floor floor(TexturaGrassId, 1000.0f, 1.0f, 1000.0f, glm::vec3(0.0f, -2.0f, 0.0f));
+
 	GLuint OQTV = 0;
 	GLuint OQTI = 0;
-	GLuint OQVAO = CarregaQuadrilatero(OQTV, OQTI, 1.0f, 1.0f, 1.0f, glm::vec3(-2.0f, 0.0f, 0.0f));
+	GLuint OQVAO = CarregaQuadrilatero(OQTV, OQTI, 1.0f, 1.0f, 1.0f, 1.0f, glm::vec3(-2.0f, 0.0f, 0.0f));
 
 	GLuint OESTV = 0;
 	GLuint OESTI = 0;
@@ -137,17 +141,16 @@ int main() {
 		
 		ObjectShader.setMat4("Projection", Projection);
 		ObjectShader.setMat4("View", View);
+		
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TexturaId);
-
-		glBindVertexArray(OQVAO);
-		ObjectShader.setMat4("Model", Model);
-		glDrawElements(GL_TRIANGLES, OQTI, GL_UNSIGNED_INT, nullptr);
+		floor.Render(&ObjectShader);
 
 		glBindVertexArray(OESVAO);
 		ObjectShader.setMat4("Model", Model);
 		glDrawElements(GL_TRIANGLES, OESTI, GL_UNSIGNED_INT, nullptr);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, TexturaNuvemId);
 
 		glBindVertexArray(OEVAO);
 		ObjectShader.setMat4("Model", Transform);

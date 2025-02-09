@@ -91,7 +91,7 @@
 				0,
 				1,
 				2,
-				3
+				8
 			]
 		},
 		{
@@ -127,7 +127,7 @@
 			"language" : "C",
 			"sourceIndexes" : 
 			[
-				4
+				3
 			]
 		}
 	],
@@ -193,16 +193,18 @@
 				1,
 				2,
 				3,
-				4
+				8
 			]
 		},
 		{
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
+				4,
 				5,
 				6,
-				7
+				7,
+				9
 			]
 		}
 	],
@@ -228,12 +230,6 @@
 		},
 		{
 			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "Geometria.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
 			"compileGroupIndex" : 1,
 			"path" : "dependencias/glad/src/glad.c",
 			"sourceGroupIndex" : 0
@@ -251,6 +247,22 @@
 		{
 			"backtrace" : 1,
 			"path" : "Light.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Geometria.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "Geometria.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Objetos.h",
 			"sourceGroupIndex" : 1
 		}
 	],
