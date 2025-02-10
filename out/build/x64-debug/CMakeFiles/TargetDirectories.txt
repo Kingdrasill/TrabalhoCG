@@ -1,3 +1,0 @@
-C:/Users/gabri/Documents/CEFET/8P/CG/TrabalhoFinal/out/build/x64-debug/CMakeFiles/TrabalhoFinal.dir
-C:/Users/gabri/Documents/CEFET/8P/CG/TrabalhoFinal/out/build/x64-debug/CMakeFiles/edit_cache.dir
-C:/Users/gabri/Documents/CEFET/8P/CG/TrabalhoFinal/out/build/x64-debug/CMakeFiles/rebuild_cache.dir
