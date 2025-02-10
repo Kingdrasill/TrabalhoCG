@@ -8,6 +8,11 @@ void MouseCallback(GLFWwindow* Window, double xposIn, double yposIn);
 
 void ScrollCallback(GLFWwindow* Window, double xoffset, double yoffset);
 
+float getRandomInRange(float min, float max);
+
+#define NUM_ARV 2000
+#define NUM_ARB 2000
+
 int Width = 1280;
 int Height = 720;
 
@@ -22,6 +27,7 @@ float lastFrame = 0.0f;
 glm::vec3 LightPos(0.0f, 4.0f, 0.0f);
 
 int main() {
+	std::srand(std::time(0));
 	setlocale(LC_ALL, "pt_BR");
 	assert(glfwInit() == GLFW_TRUE);
 
@@ -53,31 +59,66 @@ int main() {
 	GLuint TexturaGramaTerrorId = CarregarTextura("textures/grass3.jpg");
 	GLuint TexturaTreeId = CarregarTextura("textures/tree.jpg");
 	GLuint TexturaFolhasId = CarregarTextura("textures/folhas2.jpg");
+	GLuint TexturaArbustoId = CarregarTextura("textures/folhas2.jpg");
 
 	GLuint LETV = 0;
 	GLuint LETI = 0;
-	GLuint LEVAO = CarregaCone(LETV, LETI, 5, 1, LightPos);
+	GLuint LEVAO = CarregarSemiesfera(LETV, LETI, 1, LightPos);
 
 	Floor floor(TexturaGramaTerrorId, 1000.0f, 1.0f, 1000.0f, glm::vec3(0.0f, -2.0f, 0.0f));
 
-	Floor floor1(TexturaMundoId, 8.0f, 3.0f, 0.2f, glm::vec3(0.0f, 0.0f, 0.0f));
-	Floor floor2(TexturaGrassId, 1.0f, 2.0f, 0.2f, glm::vec3(0.0f, -0.5f, 0.2f));
+	std::array<Arvore, NUM_ARV> arvores;
+	for (int i = 0; i < NUM_ARV; i++) {
+		float x;
+		float z;
 
-	std::array<Arvore, 5> arvores;
+		if (rand() % 2 == 0) {
+			x = (rand() % 2 == 0) ? getRandomInRange(-250, -12) : getRandomInRange(12, 250);
+			z = (rand() % 2 == 0) ? getRandomInRange(-250, 0) : getRandomInRange(0, 250);
+		}
+		else {
+			x = (rand() % 2 == 0) ? getRandomInRange(-250, 0) : getRandomInRange(0, 250);
+			z = (rand() % 2 == 0) ? getRandomInRange(-250, -12) : getRandomInRange(12, 250);
+		}
 
-	for (int i = 0; i < 5; i++) {
-		float x = 0.25 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.75 - 0.25)));
-		arvores[i] = Arvore(TexturaTreeId, TexturaFolhasId, glm::vec3(2*i, -0.5f, 1.0f), 2, 4, x*0.8, 2*x);
+		float raio = 0.25 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.75 - 0.25)));
+		float alturaB = 1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2.5 - 1)));
+		float alturaC = 4 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (10 - 4)));
+		float elevacaoC = 0.5 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (alturaB - 0.5)));
+		
+		arvores[i] = Arvore(TexturaTreeId, TexturaFolhasId, glm::vec3(x, (-1.0 + 0.5 * (alturaB - 1)), z), alturaB, alturaC, raio*0.8, 2.2*raio, elevacaoC);
 	}
+
+	std::array<Arbusto, NUM_ARB> arbustos;
+	for (int i = 0; i < NUM_ARV; i++) {
+		float x;
+		float z;
+
+		if (rand() % 2 == 0) {
+			x = (rand() % 2 == 0) ? getRandomInRange(-250, -12) : getRandomInRange(12, 250);
+			z = (rand() % 2 == 0) ? getRandomInRange(-250, 0) : getRandomInRange(0, 250);
+		}
+		else {
+			x = (rand() % 2 == 0) ? getRandomInRange(-250, 0) : getRandomInRange(0, 250);
+			z = (rand() % 2 == 0) ? getRandomInRange(-250, -12) : getRandomInRange(12, 250);
+		}
+
+		float raio = 0.5 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1.5 - 0.5)));
+
+		arbustos[i] = Arbusto(TexturaArbustoId, glm::vec3(x, -1.5f, z), raio);
+	}
+
+	Cerca cerca(TexturaTreeId, glm::vec3(0, -0.5, 0), 1, 0.0f);
+	Cerca cerca2(TexturaTreeId, glm::vec3(-2*1-0.75, -0.5, 0), 1, 90.0f);
 
 	ObjectShader.Use();
 	ObjectShader.setInt("material.diffuse", 0);
 
 	DirectionalLight dl(
 		glm::vec3(0.0f, -10.0f, 0.0f),
-		glm::vec3(0.05f, 0.05f, 0.05f),
-		glm::vec3(0.4f, 0.4f, 0.4f),
-		glm::vec3(0.5f, 0.5f, 0.5f)
+		glm::vec3(0.3f, 0.3f, 0.3f),
+		glm::vec3(0.6f, 0.6f, 0.6f),
+		glm::vec3(1.0f, 1.0f, 1.0f)
 	);
 
 	PointLight pl1(glm::vec3(100.0f, 100.0f, 100.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
@@ -135,12 +176,17 @@ int main() {
 		ObjectShader.setMat4("View", View);
 
 		floor.Render(&ObjectShader);
-		floor1.Render(&ObjectShader);
-		floor2.Render(&ObjectShader);
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < NUM_ARV; i++) {
 			arvores[i].Render(&ObjectShader);
 		}
+
+		for (int i = 0; i < NUM_ARB; i++) {
+			arbustos[i].Render(&ObjectShader);
+		}
+
+		cerca.Render(&ObjectShader);
+		cerca2.Render(&ObjectShader);
 
 	   // Adicionado Luz Objeto
 		LightShader.Use();
@@ -200,4 +246,8 @@ void MouseCallback(GLFWwindow* Window, double xposIn, double yposIn) {
 
 void ScrollCallback(GLFWwindow* Window, double xoffset, double yoffset) {
 	camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+float getRandomInRange(float min, float max) {
+	return min + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (max - min)));
 }

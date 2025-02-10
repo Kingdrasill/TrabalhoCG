@@ -531,3 +531,99 @@ GLuint CarregaCone(GLuint& TotalVertices, GLuint& TotalIndices, float altura, fl
 
 	return VAO;
 }
+
+void GerarMalhaSemiesfera(GLuint resolucao, float raio, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices) {
+	Vertices.clear();
+	Indices.clear();
+
+	constexpr float Pi = glm::pi<float>();
+	constexpr float DoisPi = glm::two_pi<float>();
+
+	const float InversoResolucao = 1.0f / static_cast<float>(resolucao - 1);
+
+	for (GLuint UIndice = 0; UIndice < resolucao; ++UIndice) {
+		const float U = UIndice * InversoResolucao;
+		const float Phi = glm::mix(0.0f, DoisPi, U); // Full 360-degree rotation
+
+		for (GLuint VIndice = 0; VIndice < resolucao; ++VIndice) {
+			const float V = VIndice * InversoResolucao;
+			const float Theta = glm::mix(0.0f, Pi / 2, V); // Only top half (0 to Pi/2)
+
+			glm::vec3 PosicaoVertice = Centro + raio * glm::vec3{
+				glm::sin(Theta) * glm::cos(Phi),
+				glm::sin(Theta) * glm::sin(Phi),
+				glm::cos(Theta),
+			};
+
+			Vertice Vertice{
+				PosicaoVertice,
+				glm::normalize(PosicaoVertice - Centro),
+				glm::vec3{1.0f, 1.0f, 1.0f},
+				glm::vec2{1.0f - U, V}
+			};
+
+			Vertices.push_back(Vertice);
+		}
+	}
+
+	for (GLuint U = 0; U < resolucao - 1; ++U) {
+		for (GLuint V = 0; V < resolucao - 1; ++V) {
+			GLuint P0 = U + V * resolucao;
+			GLuint P1 = (U + 1) + V * resolucao;
+			GLuint P2 = (U + 1) + (V + 1) * resolucao;
+			GLuint P3 = U + (V + 1) * resolucao;
+
+			Indices.push_back(glm::ivec3{ P0, P1, P3 });
+			Indices.push_back(glm::ivec3{ P3, P1, P2 });
+		}
+	}
+}
+
+GLuint CarregarSemiesfera(GLuint& TotalVertices, GLuint& TotalIndices, float raio, glm::vec3 Centro) {
+	std::vector<Vertice> Vertices;
+	std::vector<glm::ivec3> Triangulos;
+
+	GerarMalhaSemiesfera(50, raio, Centro, Vertices, Triangulos);
+
+	TotalVertices = Vertices.size();
+	TotalIndices = Triangulos.size() * 3;
+
+	GLuint VertexBuffer;
+	glGenBuffers(1, &VertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
+
+	GLsizeiptr size = Vertices.size() * sizeof(Vertice);
+	glBufferData(GL_ARRAY_BUFFER, size, Vertices.data(), GL_STATIC_DRAW);
+
+	GLuint ElementBuffer;
+	glGenBuffers(1, &ElementBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
+
+	GLsizeiptr sizeIndice = TotalIndices * sizeof(GLuint);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeIndice, Triangulos.data(), GL_STATIC_DRAW);
+
+	GLuint VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertice),
+		nullptr);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(Vertice),
+		reinterpret_cast<void*>(offsetof(Vertice, Normal)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_TRUE, sizeof(Vertice),
+		reinterpret_cast<void*>(offsetof(Vertice, Cor)));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_TRUE, sizeof(Vertice),
+		reinterpret_cast<void*>(offsetof(Vertice, UV)));
+
+	glBindVertexArray(0);
+
+	return VAO;
+}

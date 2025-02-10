@@ -34,4 +34,8 @@ void GerarMalhaCone(GLuint resolucao, float altura, float raio, glm::vec3 Centro
 
 GLuint CarregaCone(GLuint& TotalVertices, GLuint& TotalIndices, float altura, float raio, glm::vec3 Centro);
 
+void GerarMalhaSemiesfera(GLuint resolucao, float raio, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices);
+
+GLuint CarregarSemiesfera(GLuint& TotalVertices, GLuint& TotalIndices, float raio, glm::vec3 Centro);
+
 #endif
