@@ -12,6 +12,9 @@ float getRandomInRange(float min, float max);
 
 #define NUM_ARV 2000
 #define NUM_ARB 2000
+#define CRC_FRENTE 8
+#define CRC_X 10
+#define CRC_Z 15
 
 int Width = 1280;
 int Height = 720;
@@ -54,18 +57,19 @@ int main() {
 	Shader ObjectShader("shaders/triangle_vert.glsl", "shaders/triangle_frag.glsl");
 
 	GLuint TexturaMundoId = CarregarTextura("textures/mundo.jpg");
-	GLuint TexturaNuvemId = CarregarTextura("textures/nuvem.jpg");
 	GLuint TexturaGrassId = CarregarTextura("textures/grass.jpg");
 	GLuint TexturaGramaTerrorId = CarregarTextura("textures/grass3.jpg");
 	GLuint TexturaTreeId = CarregarTextura("textures/tree.jpg");
 	GLuint TexturaFolhasId = CarregarTextura("textures/folhas2.jpg");
 	GLuint TexturaArbustoId = CarregarTextura("textures/folhas2.jpg");
+	GLuint BrancoId = CarregarTextura("textures/branco.jpg");
 
 	GLuint LETV = 0;
 	GLuint LETI = 0;
 	GLuint LEVAO = CarregarSemiesfera(LETV, LETI, 1, LightPos);
 
 	Floor floor(TexturaGramaTerrorId, 1000.0f, 1.0f, 1000.0f, glm::vec3(0.0f, -2.0f, 0.0f));
+	Floor floor2(BrancoId, 1.0f, 10.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	std::array<Arvore, NUM_ARV> arvores;
 	for (int i = 0; i < NUM_ARV; i++) {
@@ -78,7 +82,7 @@ int main() {
 		}
 		else {
 			x = (rand() % 2 == 0) ? getRandomInRange(-250, 0) : getRandomInRange(0, 250);
-			z = (rand() % 2 == 0) ? getRandomInRange(-250, -12) : getRandomInRange(12, 250);
+			z = (rand() % 2 == 0) ? getRandomInRange(-250, -17) : getRandomInRange(17, 250);
 		}
 
 		float raio = 0.25 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.75 - 0.25)));
@@ -100,7 +104,7 @@ int main() {
 		}
 		else {
 			x = (rand() % 2 == 0) ? getRandomInRange(-250, 0) : getRandomInRange(0, 250);
-			z = (rand() % 2 == 0) ? getRandomInRange(-250, -12) : getRandomInRange(12, 250);
+			z = (rand() % 2 == 0) ? getRandomInRange(-250, -17) : getRandomInRange(17, 250);
 		}
 
 		float raio = 0.5 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1.5 - 0.5)));
@@ -108,8 +112,49 @@ int main() {
 		arbustos[i] = Arbusto(TexturaArbustoId, glm::vec3(x, -1.5f, z), raio);
 	}
 
-	Cerca cerca(TexturaTreeId, glm::vec3(0, -0.5, 0), 1, 0.0f);
-	Cerca cerca2(TexturaTreeId, glm::vec3(-2*1-0.75, -0.5, 0), 1, 90.0f);
+	GLuint CercaId = CarregarTextura("textures/tree-flipped.jpg");
+	GLuint CercaViradaId = CarregarTextura("textures/tree.jpg");
+	float largura = 2;
+
+	std::array<Cerca, CRC_X> cercas_fundo;
+	int count = 0;
+	for (int i = 1; i < CRC_X / 2 + 1; i++) {
+		cercas_fundo[count] = Cerca(CercaId, CercaViradaId, glm::vec3(-i * largura + largura/2, -0.75, -15.0f), largura, 0.0f, 1.0f, 1.0f);
+		count++;
+		cercas_fundo[count] = Cerca(CercaId, CercaViradaId, glm::vec3(i * largura - largura/2, -0.75, -15.0f), largura, 0.0f, 1.0f, 1.0f);
+		count++;
+	}
+
+	std::array<Cerca, CRC_Z> cercas_esq;
+	count = 0;
+	cercas_esq[0] = Cerca(CercaId, CercaViradaId, glm::vec3(-10.0f, -0.75, 0.0f), largura, 90.0f, 1.0f, 1.0f);
+	count++;
+	for (int i = 1; i < (CRC_Z - 1) / 2 + 1 ; i++) {
+		cercas_esq[count] = Cerca(CercaId, CercaViradaId, glm::vec3(-10.0f, -0.75, -i * largura), largura, 90.0f, 1.0f, 1.0f);
+		count++;
+		cercas_esq[count] = Cerca(CercaId, CercaViradaId, glm::vec3(-10.0f, -0.75, i * largura), largura, 90.0f, 1.0f, 1.0f);
+		count++;
+	}
+
+	std::array<Cerca, CRC_Z> cercas_dir;
+	count = 0;
+	cercas_dir[0] = Cerca(CercaId, CercaViradaId, glm::vec3(10.0f, -0.75, 0.0f), largura, -90.0f, 1.0f, 1.0f);
+	count++;
+	for (int i = 1; i < (CRC_Z - 1) / 2 + 1; i++) {
+		cercas_dir[count] = Cerca(CercaId, CercaViradaId, glm::vec3(10.0f, -0.75, -i * largura), largura, -90.0f, 1.0f, 1.0f);
+		count++;
+		cercas_dir[count] = Cerca(CercaId, CercaViradaId, glm::vec3(10.0f, -0.75, i * largura), largura, -90.0f, 1.0f, 1.0f);
+		count++;
+	}
+
+	std::array<Cerca, CRC_FRENTE> cercas_frente;
+	count = 0;
+	for (int i = 1; i < CRC_FRENTE / 2 + 1; i++) {
+		cercas_frente[count] = Cerca(CercaId, CercaViradaId, glm::vec3(-i * largura + largura / 2 - 2, -0.75, 15.0f), largura, 180.0f, 1.0f, 1.0f);
+		count++;
+		cercas_frente[count] = Cerca(CercaId, CercaViradaId, glm::vec3(i * largura - largura / 2 + 2, -0.75, 15.0f), largura, 180.0f, 1.0f, 1.0f);
+		count++;
+	}
 
 	ObjectShader.Use();
 	ObjectShader.setInt("material.diffuse", 0);
@@ -133,7 +178,7 @@ int main() {
 		glm::cos(glm::radians(27.5f)),
 		1.0f,
 		0.09f,
-		0.008f,
+		0.0f,
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f)
@@ -176,6 +221,7 @@ int main() {
 		ObjectShader.setMat4("View", View);
 
 		floor.Render(&ObjectShader);
+		floor2.Render(&ObjectShader);
 
 		for (int i = 0; i < NUM_ARV; i++) {
 			arvores[i].Render(&ObjectShader);
@@ -185,8 +231,21 @@ int main() {
 			arbustos[i].Render(&ObjectShader);
 		}
 
-		cerca.Render(&ObjectShader);
-		cerca2.Render(&ObjectShader);
+		for (int i = 0; i < CRC_X; i++) {
+			cercas_fundo[i].Render(&ObjectShader);
+		}
+
+		for (int i = 0; i < CRC_Z; i++) {
+			cercas_esq[i].Render(&ObjectShader);
+		}
+
+		for (int i = 0; i < CRC_Z; i++) {
+			cercas_dir[i].Render(&ObjectShader);
+		}
+
+		for (int i = 0; i < CRC_FRENTE; i++) {
+			cercas_frente[i].Render(&ObjectShader);
+		}
 
 	   // Adicionado Luz Objeto
 		LightShader.Use();
@@ -202,6 +261,26 @@ int main() {
 	}
 
 	glDeleteBuffers(1, &LEVAO);
+	floor.Delete();
+	floor2.Delete();
+	for (int i = 0; i < NUM_ARV; i++) {
+		arvores[i].Delete();
+	}
+	for (int i = 0; i < NUM_ARB; i++) {
+		arbustos[i].Delete();
+	}
+	for (int i = 0; i < CRC_X; i++) {
+		cercas_fundo[i].Delete();
+	}
+	for (int i = 0; i < CRC_Z; i++) {
+		cercas_esq[i].Delete();
+	}
+	for (int i = 0; i < CRC_Z; i++) {
+		cercas_dir[i].Delete();
+	}
+	for (int i = 0; i < CRC_FRENTE; i++) {
+		cercas_frente[i].Delete();
+	}
 	glfwTerminate();
 	return 0;
 }

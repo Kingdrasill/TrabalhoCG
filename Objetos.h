@@ -33,6 +33,9 @@ public:
 		glDrawElements(GL_TRIANGLES, FloorTI, GL_UNSIGNED_INT, nullptr);
 	}
 
+	void Delete() {
+		glDeleteBuffers(1, &FloorVAO);
+	}
 };
 
 class Arvore {
@@ -94,6 +97,12 @@ public:
 		shader->setMat4("Model", ModelCopa);
 		glDrawElements(GL_TRIANGLES, CopaTI, GL_UNSIGNED_INT, nullptr);
 	}
+
+	void Delete() {
+		glDeleteBuffers(1, &BaseVAO);
+
+		glDeleteBuffers(1, &CopaVAO);
+	}
 };
 
 class Arbusto {
@@ -129,12 +138,18 @@ public:
 		shader->setMat4("Model", Model);
 		glDrawElements(GL_TRIANGLES, ArbustoTI, GL_UNSIGNED_INT, nullptr);
 	}
+
+	void Delete() {
+		glDeleteBuffers(1, &ArbustoVAO);
+	}
 };
 
 class Cerca {
 public:
 	glm::vec3 Centro;
 	GLuint Texture;
+	GLuint TextureFlipped;
+
 	glm::mat4 ModelVertical;
 	glm::mat4 ModelHorizontalU;
 	glm::mat4 ModelHorizontalD;
@@ -161,45 +176,49 @@ public:
 	
 	Cerca() {}
 
-	Cerca(GLuint texture, glm::vec3 centro, float largura, float angulo) {
-		ModelVertical = glm::mat4(1.0f);
-		ModelVertical = glm::translate(ModelVertical, -centro);
-		ModelVertical = glm::rotate(ModelVertical, glm::radians(angulo), glm::vec3(0.0f, 1.0f, 0.0f));
-		ModelVertical = glm::translate(ModelVertical, centro);
-		Texture = texture;
+	Cerca(GLuint texture, GLuint textureFlipped, glm::vec3 centro, float largura, float angulo, float centroH, float tamanhoH) {
+		float lrgInd = largura / 6;
 
-		glm::vec3 centroL = centro - glm::vec3(largura, 0.0f, 0.0f);
+		ModelVertical = glm::mat4(1.0f);
+		ModelVertical = glm::translate(ModelVertical, centro);
+		ModelVertical = glm::rotate(ModelVertical, glm::radians(angulo), glm::vec3(0.0f, 1.0f, 0.0f));
+		ModelVertical = glm::translate(ModelVertical, -centro);
+
+		Texture = texture;
+		TextureFlipped = textureFlipped;
+
+		glm::vec3 centroL = centro - glm::vec3(2*lrgInd, 0.0f, 0.0f);
 		glm::vec3 centroM = centro;
-		glm::vec3 centroR = centro + glm::vec3(largura, 0.0f, 0.0f);
+		glm::vec3 centroR = centro + glm::vec3(2*lrgInd, 0.0f, 0.0f);
 
 		CercaLTV = 0;
 		CercaLTI = 0;
-		CercaLVAO = CarregaQuadrilatero(CercaLTV, CercaLTI, 1, 0.5, 2.0f, 0.2f, centroL);
+		CercaLVAO = CarregaQuadrilatero(CercaLTV, CercaLTI, 1, lrgInd, 1.5f, 0.2f, centroL);
 
 		CercaMTV = 0;
 		CercaMTI = 0;
-		CercaMVAO = CarregaQuadrilatero(CercaMTV, CercaMTI, 1, 0.5, 2.0f, 0.2f, centroM);
+		CercaMVAO = CarregaQuadrilatero(CercaMTV, CercaMTI, 1, lrgInd, 1.5f, 0.2f, centroM);
 
 		CercaRTV = 0;
 		CercaRTI = 0;
-		CercaRVAO = CarregaQuadrilatero(CercaRTV, CercaRTI, 1, 0.5, 2.0f, 0.2f, centroR);
+		CercaRVAO = CarregaQuadrilatero(CercaRTV, CercaRTI, 1, lrgInd, 1.5f, 0.2f, centroR);
 
 
-		glm::vec3 centroU = centro + glm::vec3(0.0f, 0.5, 0.1f);
-		glm::vec3 centroD = centro + glm::vec3(0.0f, -0.5, 0.1f);
+		glm::vec3 centroU = centro + glm::vec3(0.0f, centroH*lrgInd, 0.1f);
+		glm::vec3 centroD = centro + glm::vec3(0.0f, -centroH*lrgInd, 0.1f);
 
 		CercaUTV = 0;
 		CercaUTI = 0;
-		CercaUVAO = CarregaQuadrilatero(CercaUTV, CercaUTI, 1, 2*largura+0.75, 0.5, 0.2f, centroU);
+		CercaUVAO = CarregaQuadrilatero(CercaUTV, CercaUTI, 1, 6*lrgInd, tamanhoH*lrgInd, 0.2f, centroU);
 
 		CercaDTV = 0;
 		CercaDTI = 0;
-		CercaDVAO = CarregaQuadrilatero(CercaDTV, CercaDTI, 1, 2*largura+0.75, 0.5, 0.2f, centroD);
+		CercaDVAO = CarregaQuadrilatero(CercaDTV, CercaDTI, 1, 6*lrgInd, tamanhoH*lrgInd, 0.2f, centroD);
 	}
 
 	void Render(Shader* shader) {
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, Texture);
+		glBindTexture(GL_TEXTURE_2D, TextureFlipped);
 
 		glBindVertexArray(CercaLVAO);
 		shader->setMat4("Model", ModelVertical);
@@ -213,6 +232,9 @@ public:
 		shader->setMat4("Model", ModelVertical);
 		glDrawElements(GL_TRIANGLES, CercaRTI, GL_UNSIGNED_INT, nullptr);
 
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, Texture);
+
 		glBindVertexArray(CercaUVAO);
 		shader->setMat4("Model", ModelVertical);
 		glDrawElements(GL_TRIANGLES, CercaUTI, GL_UNSIGNED_INT, nullptr);
@@ -220,6 +242,18 @@ public:
 		glBindVertexArray(CercaDVAO);
 		shader->setMat4("Model", ModelVertical);
 		glDrawElements(GL_TRIANGLES, CercaDTI, GL_UNSIGNED_INT, nullptr);
+	}
+
+	void Delete() {
+		glDeleteBuffers(1, &CercaLVAO);
+
+		glDeleteBuffers(1, &CercaMVAO);
+
+		glDeleteBuffers(1, &CercaRVAO);
+
+		glDeleteBuffers(1, &CercaUVAO);
+
+		glDeleteBuffers(1, &CercaDVAO);
 	}
 };
 
