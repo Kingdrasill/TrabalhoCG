@@ -257,4 +257,224 @@ public:
 	}
 };
 
+class Parede {
+public:
+	glm::vec3 Centro;
+	GLuint Texture;
+	glm::mat4 Model;
+	GLuint ParedeTV; // Número total de vértices
+	GLuint ParedeTI; // Número total de índices
+	GLuint ParedeVAO; // Vertex Array Object
+
+
+	Parede(GLuint texture, float xsize, float ysize, float zsize, glm::vec3 centro) {
+		Model = glm::mat4(1.0f);
+
+		Centro = centro;
+		Texture = texture;
+
+		ParedeTV = 0;
+		ParedeTI = 0;
+		ParedeVAO = CarregaQuadrilatero(ParedeTV, ParedeTI, 1, xsize, ysize, zsize, Centro);
+	}
+
+	void Render(Shader* shader) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, Texture);
+
+		glBindVertexArray(ParedeVAO);
+		shader->setMat4("Model", Model);
+		glDrawElements(GL_TRIANGLES, ParedeTI, GL_UNSIGNED_INT, nullptr);
+	}
+
+	void Delete() {
+		glDeleteBuffers(1, &ParedeVAO);
+	}
+};
+
+class ParedePorta {
+public:
+	glm::vec3 Centro;
+	GLuint Texture;
+	glm::mat4 Model;
+	// Parede Esquerda
+	GLuint ParedeETV; // Número total de vértices
+	GLuint ParedeETI; // Número total de índices
+	GLuint ParedeEVAO; // Vertex Array Object
+
+	// Parede Direita
+	GLuint ParedeDTV; // Número total de vértices
+	GLuint ParedeDTI; // Número total de índices
+	GLuint ParedeDVAO; // Vertex Array Object
+
+	// Parede Cima
+	GLuint ParedeCTV; // Número total de vértices
+	GLuint ParedeCTI; // Número total de índices
+	GLuint ParedeCVAO; // Vertex Array Object
+
+	ParedePorta(GLuint texture, float xsize, float ysize, float zsize, float xsizeporta, float ysizeporta, glm::vec3 centro, glm::vec3 distanciaporta) {
+		Model = glm::mat4(1.0f);
+
+		Centro = centro;
+		Texture = texture;
+
+		float xsizeE;
+		float xsizeD;
+		float xcentroE;
+		float xcentroD;
+		glm::vec3 centroE;
+		glm::vec3 centroC;
+		glm::vec3 centroD;
+
+
+		xsizeE = xsize / 2 + distanciaporta.x - xsizeporta / 2;
+		xcentroE = xsizeE / 2 - distanciaporta.x + xsizeporta / 2;
+		xsizeD = xsize - xsizeE - xsizeporta;
+		xcentroD = centro.x - xsize / 2 + xsizeD / 2;
+
+
+		centroE = centro + glm::vec3(xcentroE, 0, 0);		 
+		centroC = centro - distanciaporta + glm::vec3(0, ysize / 2, 0);
+		centroD = centro + glm::vec3(xcentroD, 0, 0);
+
+		ParedeETV = 0;
+		ParedeETI = 0;
+		ParedeEVAO = CarregaQuadrilatero(ParedeETV, ParedeETI, 1, xsizeE, ysize, zsize, centroE);
+
+		ParedeCTV = 0;
+		ParedeCTI = 0;
+		ParedeCVAO = CarregaQuadrilatero(ParedeCTV, ParedeCTI, 1, xsizeporta, ysize - ysizeporta, zsize, centroC);
+
+		ParedeDTV = 0;
+		ParedeDTI = 0;
+		ParedeDVAO = CarregaQuadrilatero(ParedeDTV, ParedeDTI, 1, xsizeD, ysize, zsize, centroD);
+	}
+
+	void Render(Shader* shader) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, Texture);
+
+		glBindVertexArray(ParedeEVAO);
+		shader->setMat4("Model", Model);
+		glDrawElements(GL_TRIANGLES, ParedeETI, GL_UNSIGNED_INT, nullptr);
+
+		glBindVertexArray(ParedeDVAO);
+		shader->setMat4("Model", Model);
+		glDrawElements(GL_TRIANGLES, ParedeDTI, GL_UNSIGNED_INT, nullptr);
+
+		glBindVertexArray(ParedeCVAO);
+		shader->setMat4("Model", Model);
+		glDrawElements(GL_TRIANGLES, ParedeCTI, GL_UNSIGNED_INT, nullptr);
+	}
+
+	void Delete() {
+		glDeleteBuffers(1, &ParedeEVAO);
+		glDeleteBuffers(1, &ParedeDVAO);
+		glDeleteBuffers(1, &ParedeCVAO);
+	}
+};
+
+class ParedeJanela {
+public:
+	glm::vec3 Centro;
+	GLuint Texture;
+	glm::mat4 Model;
+	// Parede Esquerda
+	GLuint ParedeETV; // Número total de vértices
+	GLuint ParedeETI; // Número total de índices
+	GLuint ParedeEVAO; // Vertex Array Object
+
+	// Parede Direita
+	GLuint ParedeDTV; // Número total de vértices
+	GLuint ParedeDTI; // Número total de índices
+	GLuint ParedeDVAO; // Vertex Array Object
+
+	// Parede Cima
+	GLuint ParedeCTV; // Número total de vértices
+	GLuint ParedeCTI; // Número total de índices
+	GLuint ParedeCVAO; // Vertex Array Object
+
+	// Parede Baixo
+	GLuint ParedeBTV; // Número total de vértices
+	GLuint ParedeBTI; // Número total de índices
+	GLuint ParedeBVAO; // Vertex Array Object
+
+	ParedeJanela(GLuint texture, float xsize, float ysize, float zsize, float xsizejanela, float ysizejanela, glm::vec3 centro, glm::vec3 distanciajanela) {
+		Model = glm::mat4(1.0f);
+
+		Centro = centro;
+		Texture = texture;
+
+		float xsizeE;
+		float xsizeD;
+		float xcentroE;
+		float xcentroD;
+		glm::vec3 centroE;
+		glm::vec3 centroC;
+		glm::vec3 centroD;
+		glm::vec3 centroB;
+
+		float yTopo = centro.y + ysize / 2; // 1.5
+		float yBottom = centro.y - ysize / 2; // -1.5
+
+		float yTopJanela = centro.y - distanciajanela.y + ysizejanela / 2; // 0 - 0.5 + 0.5 = 0
+		float yBottomJanela = centro.y - distanciajanela.y - ysizejanela / 2; // 0 - 0.5 - 0.5 = -1
+
+		xsizeE = xsize / 2 + distanciajanela.x - xsizejanela / 2;
+		xcentroE = xsizeE / 2 - distanciajanela.x + xsizejanela / 2;
+		xsizeD = xsize - xsizeE - xsizejanela;
+		xcentroD = centro.x - xsize / 2 + xsizeD / 2;
+
+
+		centroE = centro + glm::vec3(xcentroE, 0, 0);
+		centroC = centro - distanciajanela + glm::vec3(0, ysizejanela / 2 + (yTopo - yTopJanela)/ 2, 0); // 0 - 0.5 + 0.5 + (1.5 - 0)/2 = 0.75 = 1.5 e até 0 
+		centroD = centro + glm::vec3(xcentroD, 0, 0);
+		centroB = centro - distanciajanela + glm::vec3(0, - ysizejanela / 2 - (yBottomJanela - yBottom) / 2, 0); // 0 - 0.5 - 0.5 + (1.5 - 0)/2 = 0.75 = 1.5 e até 0 
+
+		ParedeETV = 0;
+		ParedeETI = 0;
+		ParedeEVAO = CarregaQuadrilatero(ParedeETV, ParedeETI, 1, xsizeE, ysize, zsize, centroE);
+
+		ParedeCTV = 0;
+		ParedeCTI = 0;
+		ParedeCVAO = CarregaQuadrilatero(ParedeCTV, ParedeCTI, 1, xsizejanela, yTopo - yTopJanela, zsize, centroC); // 1,5
+
+		ParedeBTV = 0;
+		ParedeBTI = 0;
+		ParedeBVAO = CarregaQuadrilatero(ParedeBTV, ParedeBTI, 1, xsizejanela, yBottomJanela - yBottom, zsize, centroB); // -1 - -1.5 = 0.5
+
+		ParedeDTV = 0;
+		ParedeDTI = 0;
+		ParedeDVAO = CarregaQuadrilatero(ParedeDTV, ParedeDTI, 1, xsizeD, ysize, zsize, centroD);
+	}
+
+	void Render(Shader* shader) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, Texture);
+
+		glBindVertexArray(ParedeEVAO);
+		shader->setMat4("Model", Model);
+		glDrawElements(GL_TRIANGLES, ParedeETI, GL_UNSIGNED_INT, nullptr);
+
+		glBindVertexArray(ParedeDVAO);
+		shader->setMat4("Model", Model);
+		glDrawElements(GL_TRIANGLES, ParedeDTI, GL_UNSIGNED_INT, nullptr);
+
+		glBindVertexArray(ParedeCVAO);
+		shader->setMat4("Model", Model);
+		glDrawElements(GL_TRIANGLES, ParedeCTI, GL_UNSIGNED_INT, nullptr);
+
+		glBindVertexArray(ParedeBVAO);
+		shader->setMat4("Model", Model);
+		glDrawElements(GL_TRIANGLES, ParedeBTI, GL_UNSIGNED_INT, nullptr);
+	}
+
+	void Delete() {
+		glDeleteBuffers(1, &ParedeEVAO);
+		glDeleteBuffers(1, &ParedeDVAO);
+		glDeleteBuffers(1, &ParedeCVAO);
+		glDeleteBuffers(1, &ParedeBVAO);
+	}
+};
+
 #endif // !OBJETOS_H

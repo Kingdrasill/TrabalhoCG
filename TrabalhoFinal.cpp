@@ -70,6 +70,11 @@ int main() {
 
 	Floor floor(TexturaGramaTerrorId, 1000.0f, 1.0f, 1000.0f, glm::vec3(0.0f, -2.0f, 0.0f));
 	Floor floor2(BrancoId, 1.0f, 10.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+	ParedeJanela parede1(BrancoId, 10.0f, 3.0f, 0.3f, 2.0f, 1.5f, glm::vec3(0.0f, 0.0f, -10.0f), glm::vec3(0.0f,0.0f, 0.0f));
+	ParedePorta parede2(BrancoId, 10.0f, 3.0f, 0.3f, 1.0f, 2.0f, glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f,0.5f,0.0f));
+	Parede parede3(BrancoId, 0.3f, 3.0f, 20.0f, glm::vec3(-5.0f, 0.0f, 0.0f));
+	Parede parede4(BrancoId, 0.3f, 3.0f, 20.0f, glm::vec3(5.0f, 0.0f, 0.0f));
+
 
 	std::array<Arvore, NUM_ARV> arvores;
 	for (int i = 0; i < NUM_ARV; i++) {
@@ -222,6 +227,10 @@ int main() {
 
 		floor.Render(&ObjectShader);
 		floor2.Render(&ObjectShader);
+		parede1.Render(&ObjectShader);
+		parede2.Render(&ObjectShader);
+		parede3.Render(&ObjectShader);
+		parede4.Render(&ObjectShader);
 
 		for (int i = 0; i < NUM_ARV; i++) {
 			arvores[i].Render(&ObjectShader);
