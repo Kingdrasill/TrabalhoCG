@@ -11,6 +11,7 @@ struct DirLight {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    vec3 color;
 };
 
 struct PointLight {
@@ -23,6 +24,8 @@ struct PointLight {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+    vec3 color;
 };
 
 struct SpotLight {
@@ -37,10 +40,12 @@ struct SpotLight {
   
     vec3 ambient;
     vec3 diffuse;
-    vec3 specular;       
+    vec3 specular; 
+    
+    vec3 color;
 };
 
-#define NR_POINT_LIGHTS 1
+#define NR_POINT_LIGHTS 5
 
 in vec3 Normal;
 in vec2 UV;
@@ -84,7 +89,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
     vec3 ambient = light.ambient * vec3(texture(material.diffuse, UV));
     vec3 diffuse = light.specular * spec * material.specular;
     vec3 specular = light.specular * spec * material.specular;
-    return (ambient + diffuse + specular);
+    return (ambient + diffuse + specular) * light.color;
 }
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
@@ -100,7 +105,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
-    return (ambient + diffuse + specular);
+    return (ambient + diffuse + specular) * light.color;
 }
 
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
@@ -119,5 +124,5 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
-    return (ambient + diffuse + specular);
+    return (ambient + diffuse + specular)  * light.color;
 }

@@ -8,18 +8,10 @@ void MouseCallback(GLFWwindow* Window, double xposIn, double yposIn);
 
 void ScrollCallback(GLFWwindow* Window, double xoffset, double yoffset);
 
-float getRandomInRange(float min, float max);
-
-#define NUM_ARV 2000
-#define NUM_ARB 2000
-#define CRC_FRENTE 8
-#define CRC_X 10
-#define CRC_Z 15
-
 int Width = 1280;
 int Height = 720;
 
-Camera camera(glm::vec3(0.0f,0.0f,3.0f));
+Camera camera(glm::vec3(0.0f,0.0f,30.0f));
 float lastX = Width / 2.0f;
 float lastY = Height / 2.0f;
 bool firstMouse = true;
@@ -56,146 +48,100 @@ int main() {
 	Shader LightShader("shaders/light_vert.glsl", "shaders/light_frag.glsl");
 	Shader ObjectShader("shaders/triangle_vert.glsl", "shaders/triangle_frag.glsl");
 
-	GLuint TexturaMundoId = CarregarTextura("textures/mundo.jpg");
-	GLuint TexturaGrassId = CarregarTextura("textures/grass.jpg");
-	GLuint TexturaGramaTerrorId = CarregarTextura("textures/grass3.jpg");
-	GLuint TexturaTreeId = CarregarTextura("textures/tree.jpg");
-	GLuint TexturaFolhasId = CarregarTextura("textures/folhas2.jpg");
-	GLuint TexturaArbustoId = CarregarTextura("textures/folhas2.jpg");
-	GLuint BrancoId = CarregarTextura("textures/branco.jpg");
+	GLuint GramaId = CarregarTextura("textures/grass3.jpg");
+	Floor floor(GramaId, 1000.0f, 1.0f, 1000.0f, 200, glm::vec3(0.0f, -2.0f, 0.0f), 0);
 
-	GLuint LETV = 0;
-	GLuint LETI = 0;
-	GLuint LEVAO = CarregarSemiesfera(LETV, LETI, 1, LightPos);
+	GLuint TreeId = CarregarTextura("textures/tree.jpg");
+	GLuint FolhasId = CarregarTextura("textures/folhas2.jpg");
+	Floresta floresta = Floresta(TreeId, FolhasId, FolhasId);
 
-	Floor floor(TexturaGramaTerrorId, 1000.0f, 1.0f, 1000.0f, glm::vec3(0.0f, -2.0f, 0.0f));
-	Floor floor2(BrancoId, 1.0f, 10.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+	GLuint CercaViradaId = CarregarTextura("textures/tree-flipped.jpg");
+	GLuint CercaId = CarregarTextura("textures/tree.jpg");
+	Cercas cercas = Cercas(CercaViradaId, CercaId);
 
-	// Parede de trás
-	ParedeJanela paredeT1(BrancoId, 4.0f, 3.0f, 0.3f, 2.0f, 1.5f, 0, glm::vec3(3.0f, 0.0f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-	ParedeJanela paredeT2(BrancoId, 4.0f, 3.0f, 0.3f, 2.0f, 1.5f, 0, glm::vec3(-3.0f, 0.0f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-	ParedeJanela paredeT3(BrancoId, 2.0f, 3.0f, 0.3f, 1.0f, 1.5f, 0, glm::vec3(0.0f, 0.0f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	GLuint WallId = CarregarTextura("textures/wall.png");
+	GLuint RoofId = CarregarTextura("textures/roof.jpg");
+	GLuint FoundationId = CarregarTextura("textures/darl-plank.jpg");
+	GLuint TableId = CarregarTextura("textures/table.jpg");
+	GLuint PavingId = CarregarTextura("textures/rocks.jpg");
+	GLuint LanternId = CarregarTextura("textures/lanterna.jpg");
+	GLuint LanternBoxId = CarregarTextura("textures/metal.jpg");
+	GLuint MundoId = CarregarTextura("textures/mundo.jpg");
+	Casa casa = Casa(WallId, RoofId, FoundationId, PavingId, TableId, LanternId, LanternBoxId, MundoId);
 
-	// Paredes Laterais
-	ParedeJanela paredeL1(BrancoId, 12.0f, 3.0f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(-5.0f, 0.0f, 4.0f), glm::vec3(4.0f, -0.25f, 0.0f));
-	ParedeJanela paredeL2(BrancoId, 12.0f, 3.0f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(5.0f, 0.0f, 4.0f), glm::vec3(4.0f, -0.25f, 0.0f));
-	ParedeJanela paredeL3(BrancoId, 8.0f, 3.0f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(-5.0f, 0.0f, -6.0f), glm::vec3(0.0f, -0.25f, 0.0f));
-	ParedeJanela paredeL4(BrancoId, 8.0f, 3.0f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(5.0f, 0.0f, -6.0f), glm::vec3(0.0f, -0.25f, 0.0f));
+	glm::vec3 L1Pos = glm::vec3((7.0f / 3.0f), 0.35f, 15.0f);
+	glm::vec3 L2Pos = glm::vec3(-(7.0f / 3.0f), 0.35, 15.0f);
+	glm::vec3 LCPos = glm::vec3(0, -0.3, 4);
+	glm::vec3 LCEPos = glm::vec3(-4.5, -0.3, -4.9);
+	glm::vec3 LMPos = glm::vec3(3, -0.15, -7);
 
-	// Parede da Frente
-	ParedeJanela paredeF1(BrancoId, 4.0f, 3.0f, 0.3f, 1.0f, 1.5f, 0, glm::vec3(3.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-	ParedePorta paredeF2(BrancoId, 2.0f, 3.0f, 0.3f, 1.0f, 2.0f, 0, glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f,0.5f,0.0f));
-	ParedeJanela paredeF3(BrancoId, 4.0f, 3.0f, 0.3f, 1.0f, 1.5f, 0, glm::vec3(-3.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-
-	// Parede que divisa o corredor da sala principal
-	Bloco paredeD1(BrancoId, 4.0f, 3.0f, 0.3f, glm::vec3(3.0f, 0.0f, -2.0f));
-	ParedePorta paredeD2(BrancoId, 2.0f, 3.0f, 0.3f, 1.0f, 2.0f, 0, glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 0.5f, 0.0f));
-	Bloco paredeD3(BrancoId, 4.0f, 3.0f, 0.3f, glm::vec3(-3.0f, 0.0f, -2.0f));
-
-	// Paredes do corredor
-	ParedePorta paredeC1(BrancoId, 8.0f, 3.0f, 0.3f, 1.0f, 2.0f, -90, glm::vec3(1.0f, 0.0f, -6.0f), glm::vec3(2.5f, 0.5f, 0.0f));
-	ParedePorta paredeC2(BrancoId, 8.0f, 3.0f, 0.3f, 1.0f, 2.0f, -90, glm::vec3(-1.0f, 0.0f, -6.0f), glm::vec3(2.5f, 0.5f, 0.0f));
-
-
-	std::array<Arvore, NUM_ARV> arvores;
-	for (int i = 0; i < NUM_ARV; i++) {
-		float x;
-		float z;
-
-		if (rand() % 2 == 0) {
-			x = (rand() % 2 == 0) ? getRandomInRange(-250, -12) : getRandomInRange(12, 250);
-			z = (rand() % 2 == 0) ? getRandomInRange(-250, 0) : getRandomInRange(0, 250);
-		}
-		else {
-			x = (rand() % 2 == 0) ? getRandomInRange(-250, 0) : getRandomInRange(0, 250);
-			z = (rand() % 2 == 0) ? getRandomInRange(-250, -17) : getRandomInRange(17, 250);
-		}
-
-		float raio = 0.25 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.75 - 0.25)));
-		float alturaB = 1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2.5 - 1)));
-		float alturaC = 4 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (10 - 4)));
-		float elevacaoC = 0.5 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (alturaB - 0.5)));
-		
-		arvores[i] = Arvore(TexturaTreeId, TexturaFolhasId, glm::vec3(x, (-1.0 + 0.5 * (alturaB - 1)), z), alturaB, alturaC, raio*0.8, 2.2*raio, elevacaoC);
-	}
-
-	std::array<Arbusto, NUM_ARB> arbustos;
-	for (int i = 0; i < NUM_ARV; i++) {
-		float x;
-		float z;
-
-		if (rand() % 2 == 0) {
-			x = (rand() % 2 == 0) ? getRandomInRange(-250, -12) : getRandomInRange(12, 250);
-			z = (rand() % 2 == 0) ? getRandomInRange(-250, 0) : getRandomInRange(0, 250);
-		}
-		else {
-			x = (rand() % 2 == 0) ? getRandomInRange(-250, 0) : getRandomInRange(0, 250);
-			z = (rand() % 2 == 0) ? getRandomInRange(-250, -17) : getRandomInRange(17, 250);
-		}
-
-		float raio = 0.5 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1.5 - 0.5)));
-
-		arbustos[i] = Arbusto(TexturaArbustoId, glm::vec3(x, -1.5f, z), raio);
-	}
-
-	GLuint CercaId = CarregarTextura("textures/tree-flipped.jpg");
-	GLuint CercaViradaId = CarregarTextura("textures/tree.jpg");
-	float largura = 2;
-
-	std::array<Cerca, CRC_X> cercas_fundo;
-	int count = 0;
-	for (int i = 1; i < CRC_X / 2 + 1; i++) {
-		cercas_fundo[count] = Cerca(CercaId, CercaViradaId, glm::vec3(-i * largura + largura/2, -0.75, -15.0f), largura, 0.0f, 1.0f, 1.0f);
-		count++;
-		cercas_fundo[count] = Cerca(CercaId, CercaViradaId, glm::vec3(i * largura - largura/2, -0.75, -15.0f), largura, 0.0f, 1.0f, 1.0f);
-		count++;
-	}
-
-	std::array<Cerca, CRC_Z> cercas_esq;
-	count = 0;
-	cercas_esq[0] = Cerca(CercaId, CercaViradaId, glm::vec3(-10.0f, -0.75, 0.0f), largura, 90.0f, 1.0f, 1.0f);
-	count++;
-	for (int i = 1; i < (CRC_Z - 1) / 2 + 1 ; i++) {
-		cercas_esq[count] = Cerca(CercaId, CercaViradaId, glm::vec3(-10.0f, -0.75, -i * largura), largura, 90.0f, 1.0f, 1.0f);
-		count++;
-		cercas_esq[count] = Cerca(CercaId, CercaViradaId, glm::vec3(-10.0f, -0.75, i * largura), largura, 90.0f, 1.0f, 1.0f);
-		count++;
-	}
-
-	std::array<Cerca, CRC_Z> cercas_dir;
-	count = 0;
-	cercas_dir[0] = Cerca(CercaId, CercaViradaId, glm::vec3(10.0f, -0.75, 0.0f), largura, -90.0f, 1.0f, 1.0f);
-	count++;
-	for (int i = 1; i < (CRC_Z - 1) / 2 + 1; i++) {
-		cercas_dir[count] = Cerca(CercaId, CercaViradaId, glm::vec3(10.0f, -0.75, -i * largura), largura, -90.0f, 1.0f, 1.0f);
-		count++;
-		cercas_dir[count] = Cerca(CercaId, CercaViradaId, glm::vec3(10.0f, -0.75, i * largura), largura, -90.0f, 1.0f, 1.0f);
-		count++;
-	}
-
-	std::array<Cerca, CRC_FRENTE> cercas_frente;
-	count = 0;
-	for (int i = 1; i < CRC_FRENTE / 2 + 1; i++) {
-		cercas_frente[count] = Cerca(CercaId, CercaViradaId, glm::vec3(-i * largura + largura / 2 - 2, -0.75, 15.0f), largura, 180.0f, 1.0f, 1.0f);
-		count++;
-		cercas_frente[count] = Cerca(CercaId, CercaViradaId, glm::vec3(i * largura - largura / 2 + 2, -0.75, 15.0f), largura, 180.0f, 1.0f, 1.0f);
-		count++;
-	}
+	Lanterna lanterna1(LanternId, LanternBoxId, 0.5, 0.6, 0.5, L1Pos);
+	Lanterna lanterna2(LanternId, LanternBoxId, 0.5, 0.6, 0.5, L2Pos);
 
 	ObjectShader.Use();
 	ObjectShader.setInt("material.diffuse", 0);
 
+	GLuint MoonId = CarregarTextura("textures/moon.jpg");
+	Moon moon = Moon(MoonId, glm::vec3(0.0f, 30.0f, -50.0f));
+
 	DirectionalLight dl(
-		glm::vec3(0.0f, -10.0f, 0.0f),
-		glm::vec3(0.3f, 0.3f, 0.3f),
-		glm::vec3(0.6f, 0.6f, 0.6f),
-		glm::vec3(1.0f, 1.0f, 1.0f)
+		glm::vec3(-(moon.Centro - glm::vec3(0,0,0))),
+		glm::vec3(0.2f, 0.2f, 0.2f),
+		glm::vec3(0.5f, 0.5f, 0.5f),
+		glm::vec3(0.5, 0.5, 0.5),
+		glm::vec3(0.5,0.5,0.5)
 	);
 
-	PointLight pl1(glm::vec3(100.0f, 100.0f, 100.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
-	PointLight pl2(glm::vec3(2.3f, -3.3f, -4.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
-	PointLight pl3(glm::vec3(-4.0f, 2.0f, -12.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
-	PointLight pl4(glm::vec3(0.0f, 0.0f, -3.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
+	PointLight pl1(
+		L1Pos, 
+		1.0f, 
+		0.09f, 
+		0.128f, 
+		glm::vec3(0.5f, 0.5f, 0.5f), 
+		glm::vec3(0.8f, 0.8f, 0.8f), 
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(0.99, 0.89, 0.64)
+	);
+	PointLight pl2(
+		L2Pos,
+		1.0f,
+		0.09f,
+		0.128f,
+		glm::vec3(0.5f, 0.5f, 0.5f),
+		glm::vec3(0.8f, 0.8f, 0.8f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(0.99, 0.89, 0.64)
+	);
+	PointLight pl3(
+		LCPos,
+		1.0f,
+		0.09f,
+		0.128f,
+		glm::vec3(0.5f, 0.5f, 0.5f),
+		glm::vec3(0.8f, 0.8f, 0.8f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(0.99, 0.89, 0.64)
+	);
+	PointLight pl4(
+		LCEPos,
+		1.0f,
+		0.09f,
+		0.256f,
+		glm::vec3(0.5f, 0.5f, 0.5f),
+		glm::vec3(0.8f, 0.8f, 0.8f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(0.99, 0.89, 0.64)
+	);
+	PointLight pl5(
+		LMPos,
+		1.0f,
+		0.09f,
+		0.256f,
+		glm::vec3(0.5f, 0.5f, 0.5f),
+		glm::vec3(0.8f, 0.8f, 0.8f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(0, 0, 1)
+	);
 
 	SpotLight sl(
 		camera.Position,
@@ -204,10 +150,11 @@ int main() {
 		glm::cos(glm::radians(27.5f)),
 		1.0f,
 		0.09f,
-		0.0f,
+		0.032f,
 		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f)
+		glm::vec3(0.75f, 0.75f, 0.75f),
+		glm::vec3(0.988, 0.831, 0.404),
+		glm::vec3(0.988, 0.831, 0.404)
 	);
 
 	while (!glfwWindowShouldClose(window)) {
@@ -225,80 +172,47 @@ int main() {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
 		ObjectShader.Use();
 		ObjectShader.setVec3("ViewPos", 1.0f, 1.0f, 1.0f);
 		ObjectShader.setVec3("material.specular", 0.0f, 0.0f, 0.0f);
 		ObjectShader.setFloat("material.shininess", 1024.0f);
+
+
+		glm::mat4 Projection = glm::perspective(glm::radians(camera.Zoom), (float)Width / (float)Height, 0.1f, 10000.0f);
+		glm::mat4 View = camera.GetViewMatrix();
+
+		ObjectShader.setMat4("Projection", Projection);
+		ObjectShader.setMat4("View", View);
 
 		// Luz Direcional
 		dl.setToShader(&ObjectShader);
 
 		// Luz Pontuais
 		pl1.setToShader(&ObjectShader, 0);
+		pl2.setToShader(&ObjectShader, 1);
+		pl3.setToShader(&ObjectShader, 2);
+		pl4.setToShader(&ObjectShader, 3);
+		pl5.setToShader(&ObjectShader, 4);
 
 		// Lanterna
 		sl.updateCameraValues(camera.Position, camera.Front);
 		sl.setToShader(&ObjectShader);
 
-		glm::mat4 Projection = glm::perspective(glm::radians(camera.Zoom), (float)Width / (float)Height, 0.1f, 10000.0f);
-		glm::mat4 View = camera.GetViewMatrix();
-		
-		ObjectShader.setMat4("Projection", Projection);
-		ObjectShader.setMat4("View", View);
-
 		floor.Render(&ObjectShader);
-		floor2.Render(&ObjectShader);
-		// Paredes de Trás
-		paredeT1.Render(&ObjectShader);
-		paredeT2.Render(&ObjectShader);
-		paredeT3.Render(&ObjectShader);
-		// Paredes da Frente
-		paredeF1.Render(&ObjectShader);
-		paredeF2.Render(&ObjectShader);
-		paredeF3.Render(&ObjectShader);
-		// Paredes Laterais
-		paredeL1.Render(&ObjectShader);
-		paredeL2.Render(&ObjectShader);
-		paredeL3.Render(&ObjectShader);
-		paredeL4.Render(&ObjectShader);
-		// Parede divisória
-		paredeD1.Render(&ObjectShader);
-		paredeD2.Render(&ObjectShader);
-		paredeD3.Render(&ObjectShader);
-		// Paredes corredor
-		paredeC1.Render(&ObjectShader);
-		paredeC2.Render(&ObjectShader);
-
-
-		for (int i = 0; i < NUM_ARV; i++) {
-			arvores[i].Render(&ObjectShader);
-		}
-
-		for (int i = 0; i < NUM_ARB; i++) {
-			arbustos[i].Render(&ObjectShader);
-		}
-
-		for (int i = 0; i < CRC_X; i++) {
-			cercas_fundo[i].Render(&ObjectShader);
-		}
-
-		for (int i = 0; i < CRC_Z; i++) {
-			cercas_esq[i].Render(&ObjectShader);
-		}
-
-		for (int i = 0; i < CRC_Z; i++) {
-			cercas_dir[i].Render(&ObjectShader);
-		}
-
-		for (int i = 0; i < CRC_FRENTE; i++) {
-			cercas_frente[i].Render(&ObjectShader);
-		}
+		floresta.Render(&ObjectShader);
+		cercas.Render(&ObjectShader);
+		casa.Render(&ObjectShader);
+		casa.Rotate(0.5);
+		lanterna1.Render(&ObjectShader);
+		lanterna2.Render(&ObjectShader);
 
 	   // Adicionado Luz Objeto
 		LightShader.Use();
 		LightShader.setMat4("Projection", Projection);
 		LightShader.setMat4("View", View);
-		LightShader.setVec3("LightColor", 1.0f,1.0f,1.0f);
+		LightShader.setInt("TextureSampler", 0);
+		moon.Render(&LightShader);
 
 		glBindVertexArray(0);
 		glUseProgram(0);
@@ -307,27 +221,12 @@ int main() {
 		glfwSwapBuffers(window);
 	}
 
-	glDeleteBuffers(1, &LEVAO);
 	floor.Delete();
-	floor2.Delete();
-	for (int i = 0; i < NUM_ARV; i++) {
-		arvores[i].Delete();
-	}
-	for (int i = 0; i < NUM_ARB; i++) {
-		arbustos[i].Delete();
-	}
-	for (int i = 0; i < CRC_X; i++) {
-		cercas_fundo[i].Delete();
-	}
-	for (int i = 0; i < CRC_Z; i++) {
-		cercas_esq[i].Delete();
-	}
-	for (int i = 0; i < CRC_Z; i++) {
-		cercas_dir[i].Delete();
-	}
-	for (int i = 0; i < CRC_FRENTE; i++) {
-		cercas_frente[i].Delete();
-	}
+	floresta.Delete();
+	cercas.Delete();
+	casa.Delete();
+	lanterna1.Delete();
+	lanterna2.Delete();
 	glfwTerminate();
 	return 0;
 }
@@ -372,8 +271,4 @@ void MouseCallback(GLFWwindow* Window, double xposIn, double yposIn) {
 
 void ScrollCallback(GLFWwindow* Window, double xoffset, double yoffset) {
 	camera.ProcessMouseScroll(static_cast<float>(yoffset));
-}
-
-float getRandomInRange(float min, float max) {
-	return min + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (max - min)));
 }

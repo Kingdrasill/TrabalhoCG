@@ -627,3 +627,109 @@ GLuint CarregarSemiesfera(GLuint& TotalVertices, GLuint& TotalIndices, float rai
 
 	return VAO;
 }
+
+void GerarMalhaPrisma(GLuint resolucao, float repeat, float xsize, float ysize, float zsize, GLuint numSides, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices) {
+	Vertices.clear();
+	Indices.clear();
+
+	float angleStep = 2.0f * glm::pi<float>() / numSides;
+	float halfHeight = ysize / 2.0f;
+	float halfX = xsize / 2.0f;
+	float halfZ = zsize / 2.0f;
+
+	GLuint vertexOffset = 0;
+	std::vector<std::vector<GLuint>> layerIndices;
+
+	// Generate multiple layers along the height
+	for (GLuint layer = 0; layer <= resolucao; ++layer) {
+		float y = -halfHeight + (layer * (ysize / resolucao)); // Interpolated Y position
+		std::vector<GLuint> currentLayer;
+
+		for (GLuint i = 0; i < numSides; ++i) {
+			float angle = i * angleStep;
+			glm::vec3 offset = glm::vec3(halfX * cos(angle), y, halfZ * sin(angle)); // Scale based on xsize and zsize
+
+			// Add vertex
+			Vertices.push_back({ Centro + offset, glm::vec3(cos(angle), 0, sin(angle)), glm::vec3(1.0f), glm::vec2((cos(angle) + 1) / 2, (sin(angle) + 1) / 2) });
+			currentLayer.push_back(vertexOffset++);
+		}
+		layerIndices.push_back(currentLayer);
+	}
+
+	// Create faces between layers
+	for (GLuint layer = 0; layer < resolucao; ++layer) {
+		for (GLuint i = 0; i < numSides; ++i) {
+			GLuint next = (i + 1) % numSides;
+			GLuint v1 = layerIndices[layer][i];
+			GLuint v2 = layerIndices[layer][next];
+			GLuint v3 = layerIndices[layer + 1][i];
+			GLuint v4 = layerIndices[layer + 1][next];
+
+			Indices.push_back(glm::ivec3(v1, v2, v3));
+			Indices.push_back(glm::ivec3(v3, v2, v4));
+		}
+	}
+
+	// Bottom and top center vertices
+	GLuint baseCenterIndex = vertexOffset++;
+	GLuint topCenterIndex = vertexOffset++;
+
+	Vertices.push_back({ Centro + glm::vec3(0, -halfHeight, 0), glm::vec3(0, -1, 0), glm::vec3(1.0f), glm::vec2(0.5f, 0.5f) });
+	Vertices.push_back({ Centro + glm::vec3(0, halfHeight, 0), glm::vec3(0, 1, 0), glm::vec3(1.0f), glm::vec2(0.5f, 0.5f) });
+
+	// Create base and top faces
+	for (GLuint i = 0; i < numSides; ++i) {
+		GLuint next = (i + 1) % numSides;
+		Indices.push_back(glm::ivec3(baseCenterIndex, layerIndices[0][next], layerIndices[0][i]));
+		Indices.push_back(glm::ivec3(topCenterIndex, layerIndices[resolucao][i], layerIndices[resolucao][next]));
+	}
+}
+
+GLuint CarregarPrisma(GLuint& TotalVertices, GLuint& TotalIndices, float xsize, float ysize, float zsize, GLuint numSides, glm::vec3 Centro) {
+	std::vector<Vertice> Vertices;
+	std::vector<glm::ivec3> Triangulos;
+
+	GerarMalhaPrisma(50, 1, xsize, ysize, zsize, numSides, Centro, Vertices, Triangulos);
+
+	TotalVertices = Vertices.size();
+	TotalIndices = Triangulos.size() * 3;
+
+	GLuint VertexBuffer;
+	glGenBuffers(1, &VertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
+
+	GLsizeiptr size = Vertices.size() * sizeof(Vertice);
+	glBufferData(GL_ARRAY_BUFFER, size, Vertices.data(), GL_STATIC_DRAW);
+
+	GLuint ElementBuffer;
+	glGenBuffers(1, &ElementBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
+
+	GLsizeiptr sizeIndice = TotalIndices * sizeof(GLuint);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeIndice, Triangulos.data(), GL_STATIC_DRAW);
+
+	GLuint VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertice),
+		nullptr);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(Vertice),
+		reinterpret_cast<void*>(offsetof(Vertice, Normal)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_TRUE, sizeof(Vertice),
+		reinterpret_cast<void*>(offsetof(Vertice, Cor)));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_TRUE, sizeof(Vertice),
+		reinterpret_cast<void*>(offsetof(Vertice, UV)));
+
+	glBindVertexArray(0);
+
+	return VAO;
+}

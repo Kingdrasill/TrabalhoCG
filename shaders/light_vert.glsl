@@ -12,5 +12,6 @@ out vec2 UV;
 
 void main()
 {
+	UV = InUV;
 	gl_Position = Projection * View * Model * vec4(InPosition, 1.0);
 }

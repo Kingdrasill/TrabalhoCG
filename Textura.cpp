@@ -26,20 +26,23 @@ GLuint CarregarTextura(const char* caminhoTextura) {
 		&LarguraImagem,
 		&AlturaImagem,
 		&NumeroDeComponentes,
-		3);
+		0);
 	assert(DadosTextura);
+
+	GLenum formato = (NumeroDeComponentes == 4) ? GL_RGBA : GL_RGB;
 
 	if (DadosTextura) {
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			0,
-			GL_RGB,
+			formato,
 			LarguraImagem,
 			AlturaImagem,
 			0,
-			GL_RGB,
+			formato,
 			GL_UNSIGNED_BYTE,
-			DadosTextura);
+			DadosTextura
+		);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {

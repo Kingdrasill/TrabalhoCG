@@ -38,4 +38,8 @@ void GerarMalhaSemiesfera(GLuint resolucao, float raio, glm::vec3 Centro, std::v
 
 GLuint CarregarSemiesfera(GLuint& TotalVertices, GLuint& TotalIndices, float raio, glm::vec3 Centro);
 
+void GerarMalhaPrisma(GLuint resolucao, float repeat, float xsize, float ysize, float zsize, GLuint numSides, glm::vec3 Centro, std::vector<Vertice>& Vertices, std::vector<glm::ivec3>& Indices);
+
+GLuint CarregarPrisma(GLuint& TotalVertices, GLuint& TotalIndices, float xsize, float ysize, float zsize, GLuint numSides, glm::vec3 Centro);
+
 #endif

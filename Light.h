@@ -12,12 +12,14 @@ public:
 	glm::vec3 Ambient;
 	glm::vec3 Diffuse;
 	glm::vec3 Specular;
+	glm::vec3 Color;
 
-	DirectionalLight(glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular) {
+	DirectionalLight(glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 color) {
 		Direction = direction;
 		Ambient = ambient;
 		Diffuse = diffuse;
 		Specular = specular;
+		Color = color;
 	}
 
 	void setToShader(Shader* shader) {
@@ -25,6 +27,7 @@ public:
 		shader->setVec3("dirLight.ambient", Ambient);
 		shader->setVec3("dirLight.diffuse", Diffuse);
 		shader->setVec3("dirLight.specular", Specular);
+		shader->setVec3("dirLight.color", Color);
 	}
 };
 
@@ -37,8 +40,9 @@ public:
 	glm::vec3 Ambient;
 	glm::vec3 Diffuse;
 	glm::vec3 Specular;
+	glm::vec3 Color;
 
-	PointLight(glm::vec3 position, float constant, float linear, float quadratic, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular) {
+	PointLight(glm::vec3 position, float constant, float linear, float quadratic, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 color) {
 		Position = position;
 		Constant = constant;
 		Linear = linear;
@@ -46,6 +50,7 @@ public:
 		Ambient = ambient;
 		Diffuse = diffuse;
 		Specular = specular;
+		Color = color;
 	}
 
 	void setToShader(Shader* shader, int id) {
@@ -56,6 +61,7 @@ public:
 		shader->setFloat("pointLights[" + std::to_string(id) + "].constant", Constant);
 		shader->setFloat("pointLights[" + std::to_string(id) + "].linear", Linear);
 		shader->setFloat("pointLights[" + std::to_string(id) + "].quadratic", Quadratic);
+		shader->setVec3("pointLights[" + std::to_string(id) + "].color", Color);
 	}
 };
 
@@ -71,8 +77,9 @@ public:
 	glm::vec3 Ambient;
 	glm::vec3 Diffuse;
 	glm::vec3 Specular;
+	glm::vec3 Color;
 
-	SpotLight(glm::vec3 position, glm::vec3 direction, float cutOff, float outerCutOff, float constant, float linear, float quadratic, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular) {
+	SpotLight(glm::vec3 position, glm::vec3 direction, float cutOff, float outerCutOff, float constant, float linear, float quadratic, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 color) {
 		Position = position;
 		Direction = direction;
 		CutOff = cutOff;
@@ -83,6 +90,7 @@ public:
 		Ambient = ambient;
 		Diffuse = diffuse;
 		Specular = specular;
+		Color = color;
 	}
 
 	void updateCameraValues(glm::vec3 position, glm::vec3 direction) {
@@ -101,6 +109,7 @@ public:
 		shader->setVec3("spotLight.ambient", Ambient);
 		shader->setVec3("spotLight.diffuse", Diffuse);
 		shader->setVec3("spotLight.specular", Specular);
+		shader->setVec3("spotLight.color", Color);
 	}
 };
 

@@ -1,10 +1,12 @@
 #version 330 core
 
-uniform vec3 LightColor;
+uniform sampler2D TextureSampler;
+in vec2 UV;
 
 out vec4 FragColor;
 
 void main()
 {
-    FragColor = vec4(LightColor, 1.0); // set all 4 vector values to 1.0
+    vec3 TextureColor = texture(TextureSampler, UV).rgb;
+    FragColor = vec4(TextureColor, 1.0);
 }
