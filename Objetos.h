@@ -998,32 +998,32 @@ public:
 
 	Casa(GLuint textWallId, GLuint textRoofId, GLuint textFdId, GLuint textPvId, GLuint textMId, GLuint textLId, GLuint textLBId, GLuint textLMId) {
 		// Parede de trás
-		paredeT1 = ParedeJanela(textWallId, 4.3f, 3.0f, 0.3f, 2.0f, 1.5f, 0, glm::vec3(3.0f, 0.1f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-		paredeT2 = ParedeJanela(textWallId, 4.3f, 3.0f, 0.3f, 2.0f, 1.5f, 0, glm::vec3(-3.0f, 0.1f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-		paredeT3 = ParedeJanela(textWallId, 1.7f, 3.0f, 0.3f, 1.0f, 1.5f, 0, glm::vec3(0.0f, 0.1f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		paredeT1 = ParedeJanela(textWallId, 4.3f, 3.5f, 0.3f, 2.0f, 1.5f, 0, glm::vec3(3.0f, 0.35f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		paredeT2 = ParedeJanela(textWallId, 4.3f, 3.5f, 0.3f, 2.0f, 1.5f, 0, glm::vec3(-3.0f, 0.35f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		paredeT3 = ParedeJanela(textWallId, 1.7f, 3.5f, 0.3f, 1.0f, 1.5f, 0, glm::vec3(0.0f, 0.35f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 		// Paredes Laterais
-		paredeL1= ParedeJanela(textWallId, 12.0f, 3.0f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(-5.0f, 0.1f, 4.0f), glm::vec3(4.0f, -0.25f, 0.0f));
-		paredeL2 = ParedeJanela(textWallId, 12.0f, 3.0f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(5.0f, 0.1f, 4.0f), glm::vec3(4.0f, -0.25f, 0.0f));
-		paredeL3 = ParedeJanela(textWallId, 8.0f, 3.0f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(-5.0f, 0.1f, -6.0f), glm::vec3(0.0f, -0.25f, 0.0f));
-		paredeL4 = ParedeJanela(textWallId, 8.0f, 3.0f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(5.0f, 0.1f, -6.0f), glm::vec3(0.0f, -0.25f, 0.0f));
+		paredeL1= ParedeJanela(textWallId, 12.0f, 3.5f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(-5.0f, 0.35f, 4.0f), glm::vec3(4.0f, -0.25f, 0.0f));
+		paredeL2 = ParedeJanela(textWallId, 12.0f, 3.5f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(5.0f, 0.35f, 4.0f), glm::vec3(4.0f, -0.25f, 0.0f));
+		paredeL3 = ParedeJanela(textWallId, 8.0f, 3.5f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(-5.0f, 0.35f, -6.0f), glm::vec3(0.0f, -0.25f, 0.0f));
+		paredeL4 = ParedeJanela(textWallId, 8.0f, 3.5f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(5.0f, 0.35f, -6.0f), glm::vec3(0.0f, -0.25f, 0.0f));
 
 		// Parede da Frente
-		paredeF1 = ParedeJanela(textWallId, 4.3f, 3.0f, 0.3f, 1.0f, 1.5f, 0, glm::vec3(3.0f, 0.1f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-		paredeF2 = ParedePorta(textWallId, 1.7f, 3.0f, 0.3f, 1.0f, 2.0f, 0, glm::vec3(0.0f, 0.1f, 10.0f), glm::vec3(0.0f, 0.5f, 0.0f));
-		paredeF3 = ParedeJanela(textWallId, 4.3f, 3.0f, 0.3f, 1.0f, 1.5f, 0, glm::vec3(-3.0f, 0.1f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		paredeF1 = ParedeJanela(textWallId, 4.3f, 3.5f, 0.3f, 1.0f, 1.5f, 0, glm::vec3(3.0f, 0.35f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		paredeF2 = ParedePorta(textWallId, 1.7f, 3.5f, 0.3f, 1.0f, 2.0f, 0, glm::vec3(0.0f, 0.35f, 10.0f), glm::vec3(0.0f, 0.75f, 0.0f));
+		paredeF3 = ParedeJanela(textWallId, 4.3f, 3.5f, 0.3f, 1.0f, 1.5f, 0, glm::vec3(-3.0f, 0.35f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 		// Parede que divisa o corredor da sala principal
-		paredeD1 = Bloco(textWallId, 4.0f, 3.0f, 0.3f, glm::vec3(3.0f, 0.1f, -2.0f));
-		paredeD2 = ParedePorta(textWallId, 2.0f, 3.0f, 0.3f, 1.0f, 2.0f, 0, glm::vec3(0.0f, 0.1f, -2.0f), glm::vec3(0.0f, 0.5f, 0.0f));
-		paredeD3 = Bloco(textWallId, 4.0f, 3.0f, 0.3f, glm::vec3(-3.0f, 0.1f, -2.0f));
+		paredeD1 = Bloco(textWallId, 4.0f, 3.5f, 0.3f, glm::vec3(3.0f, 0.35f, -2.0f));
+		paredeD2 = ParedePorta(textWallId, 2.0f, 3.5f, 0.3f, 1.0f, 2.0f, 0, glm::vec3(0.0f, 0.35f, -2.0f), glm::vec3(0.0f, 0.75f, 0.0f));
+		paredeD3 = Bloco(textWallId, 4.0f, 3.5f, 0.3f, glm::vec3(-3.0f, 0.35f, -2.0f));
 
 		// Paredes do corredor
-		paredeC1 = ParedePorta(textWallId, 8.0f, 3.0f, 0.3f, 1.0f, 2.0f, -90, glm::vec3(1.0f, 0.1f, -6.0f), glm::vec3(2.5f, 0.5f, 0.0f));
-		paredeC2 = ParedePorta(textWallId, 8.0f, 3.0f, 0.3f, 1.0f, 2.0f, -90, glm::vec3(-1.0f, 0.1f, -6.0f), glm::vec3(2.5f, 0.5f, 0.0f));
+		paredeC1 = ParedePorta(textWallId, 8.0f, 3.5f, 0.3f, 1.0f, 2.0f, -90, glm::vec3(1.0f, 0.35f, -6.0f), glm::vec3(2.5f, 0.75f, 0.0f));
+		paredeC2 = ParedePorta(textWallId, 8.0f, 3.5f, 0.3f, 1.0f, 2.0f, -90, glm::vec3(-1.0f, 0.35f, -6.0f), glm::vec3(2.5f, 0.75f, 0.0f));
 
 		// Telhado
-		roof = Roof(textWallId, textRoofId, 2.0f, 20.3f, 11.8f, glm::vec3(0, 2.1, 0));
+		roof = Roof(textWallId, textRoofId, 2.0f, 20.3f, 11.8f, glm::vec3(0, 2.6, 0));
 
 		// Chão da casa
 		chao = Floor(textFdId, 10.3f, 20.3f, 0.1f, 4, glm::vec3(0, -1.45, 0), 90.0f);
@@ -1032,28 +1032,28 @@ public:
 		passarela = Floor(textPvId, 3.0f, 10.0f, 0.1f, 3, glm::vec3(0, -1.45, 15.15), 90.0f);
 
 		// Comodo central
-		mesaCentral = Mesa(textMId, textMId, 3, 0.7, 6, glm::vec3(0, -1.05, 4));
-		cadeirasCentral[0] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(1.75, -1.05, 2), 0);
-		cadeirasCentral[1] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(1.75, -1.05, 4), 0);
-		cadeirasCentral[2] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(1.75, -1.05, 6), 0);
-		cadeirasCentral[3] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(-1.75, -1.05, 2), 1);
-		cadeirasCentral[4] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(-1.75, -1.05, 4), 1);
-		cadeirasCentral[5] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(-1.75, -1.05, 6), 1);
-		lanternaCentral = Lanterna(textLId, textLBId, 0.5, 0.6, 0.5, glm::vec3(0, -0.3, 4));
-		
+		mesaCentral = Mesa(textMId, textMId, 3, 1, 6, glm::vec3(0, -0.9, 4));
+		cadeirasCentral[0] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(1.75, -0.9, 2), 0);
+		cadeirasCentral[1] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(1.75, -0.9, 4), 0);
+		cadeirasCentral[2] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(1.75, -0.9, 6), 0);
+		cadeirasCentral[3] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(-1.75, -0.9, 2), 1);
+		cadeirasCentral[4] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(-1.75, -0.9, 4), 1);
+		cadeirasCentral[5] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(-1.75, -0.9, 6), 1);
+		lanternaCentral = Lanterna(textLId, textLBId, 0.5, 0.6, 0.5, glm::vec3(0, 0, 4));
+
 		// Corredor
-		mesaCorredor = Mesa(textMId, textMId, 1, 0.7, 0.5, glm::vec3(0, -1.05, -9.6));
+		mesaCorredor = Mesa(textMId, textMId, 1, 1, 0.5, glm::vec3(0, -0.9, -9.6));
 
 		// Comodo Esquerdo
-		mesaCE = Mesa(textMId, textMId, 1.25, 0.7, 2.8, glm::vec3(-4.2, -1.05, -6));
-		cadeiraCE = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(-3.2, -1.05, -6), 0);
-		lanternaCE = Lanterna(textLId, textLBId, 0.5, 0.6, 0.5, glm::vec3(-4.5, -0.3, -4.9));
+		mesaCE = Mesa(textMId, textMId, 1.25, 1, 2.8, glm::vec3(-4.2, -0.9, -6));
+		cadeiraCE = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(-3.2, -0.9, -6), 0);
+		lanternaCE = Lanterna(textLId, textLBId, 0.5, 0.6, 0.5, glm::vec3(-4.5, 0, -4.9));
 
 		// Corredor Direito
-		mesaCD = Mesa(textMId, textMId, 1.5, 0.7, 2.5, glm::vec3(3, -1.05, -7));
-		cadeiraCD1 = Cadeira(textMId, textMId, 1, 1, 0.75, glm::vec3(3, -1.05, -5.5), 2);
-		cadeiraCD2 = Cadeira(textMId, textMId, 1, 1, 0.75, glm::vec3(3, -1.05, -8.5), 3);
-		lanternaMundo = LanternaBola(textLMId, textLBId, 0.75, 0.75, 0.75, glm::vec3(3, -0.15, -7));
+		mesaCD = Mesa(textMId, textMId, 1.5, 1, 2.5, glm::vec3(3, -0.9, -7));
+		cadeiraCD1 = Cadeira(textMId, textMId, 1, 1, 0.75, glm::vec3(3, -0.9, -5.5), 2);
+		cadeiraCD2 = Cadeira(textMId, textMId, 1, 1, 0.75, glm::vec3(3, -0.9, -8.5), 3);
+		lanternaMundo = LanternaBola(textLMId, textLBId, 0.75, 0.75, 0.75, glm::vec3(3, 0.075, -7));
 	}
 
 	void Render(Shader* shader) const {
