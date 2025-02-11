@@ -257,38 +257,38 @@ public:
 	}
 };
 
-class Parede {
+class Bloco {
 public:
 	glm::vec3 Centro;
 	GLuint Texture;
 	glm::mat4 Model;
-	GLuint ParedeTV; // Número total de vértices
-	GLuint ParedeTI; // Número total de índices
-	GLuint ParedeVAO; // Vertex Array Object
+	GLuint BlocoTV; // Número total de vértices
+	GLuint BlocoTI; // Número total de índices
+	GLuint BlocoVAO; // Vertex Array Object
 
 
-	Parede(GLuint texture, float xsize, float ysize, float zsize, glm::vec3 centro) {
+	Bloco(GLuint texture, float xsize, float ysize, float zsize, glm::vec3 centro) {
 		Model = glm::mat4(1.0f);
 
 		Centro = centro;
 		Texture = texture;
 
-		ParedeTV = 0;
-		ParedeTI = 0;
-		ParedeVAO = CarregaQuadrilatero(ParedeTV, ParedeTI, 1, xsize, ysize, zsize, Centro);
+		BlocoTV = 0;
+		BlocoTI = 0;
+		BlocoVAO = CarregaQuadrilatero(BlocoTV, BlocoTI, 1, xsize, ysize, zsize, Centro);
 	}
 
 	void Render(Shader* shader) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, Texture);
 
-		glBindVertexArray(ParedeVAO);
+		glBindVertexArray(BlocoVAO);
 		shader->setMat4("Model", Model);
-		glDrawElements(GL_TRIANGLES, ParedeTI, GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, BlocoTI, GL_UNSIGNED_INT, nullptr);
 	}
 
 	void Delete() {
-		glDeleteBuffers(1, &ParedeVAO);
+		glDeleteBuffers(1, &BlocoVAO);
 	}
 };
 
@@ -312,30 +312,28 @@ public:
 	GLuint ParedeCTI; // Número total de índices
 	GLuint ParedeCVAO; // Vertex Array Object
 
-	ParedePorta(GLuint texture, float xsize, float ysize, float zsize, float xsizeporta, float ysizeporta, glm::vec3 centro, glm::vec3 distanciaporta) {
+	ParedePorta(GLuint texture, float xsize, float ysize, float zsize, float xsizeporta, float ysizeporta, float angulo, glm::vec3 centro, glm::vec3 distanciaporta) {
 		Model = glm::mat4(1.0f);
+		Model = glm::translate(Model, centro);
+		Model = glm::rotate(Model, glm::radians(angulo), glm::vec3(0.0f, 1.0f, 0.0f));
+		Model = glm::translate(Model, -centro);
 
 		Centro = centro;
 		Texture = texture;
 
 		float xsizeE;
 		float xsizeD;
-		float xcentroE;
-		float xcentroD;
 		glm::vec3 centroE;
 		glm::vec3 centroC;
 		glm::vec3 centroD;
 
 
 		xsizeE = xsize / 2 + distanciaporta.x - xsizeporta / 2;
-		xcentroE = xsizeE / 2 - distanciaporta.x + xsizeporta / 2;
 		xsizeD = xsize - xsizeE - xsizeporta;
-		xcentroD = centro.x - xsize / 2 + xsizeD / 2;
-
-
-		centroE = centro + glm::vec3(xcentroE, 0, 0);		 
-		centroC = centro - distanciaporta + glm::vec3(0, ysize / 2, 0);
-		centroD = centro + glm::vec3(xcentroD, 0, 0);
+ 
+		centroE = centro + glm::vec3(distanciaporta.x - xsizeporta/2 - xsizeE/2, 0, distanciaporta.z);
+		centroC = centro + glm::vec3(distanciaporta.x, ysize / 2 - distanciaporta.y, distanciaporta.z);
+		centroD = centro + glm::vec3(distanciaporta.x + xsizeporta/2 + xsizeD/2, 0, distanciaporta.z);
 
 		ParedeETV = 0;
 		ParedeETI = 0;
@@ -399,16 +397,17 @@ public:
 	GLuint ParedeBTI; // Número total de índices
 	GLuint ParedeBVAO; // Vertex Array Object
 
-	ParedeJanela(GLuint texture, float xsize, float ysize, float zsize, float xsizejanela, float ysizejanela, glm::vec3 centro, glm::vec3 distanciajanela) {
+	ParedeJanela(GLuint texture, float xsize, float ysize, float zsize, float xsizejanela, float ysizejanela, float angulo, glm::vec3 centro, glm::vec3 distanciajanela) {
 		Model = glm::mat4(1.0f);
+		Model = glm::translate(Model, centro);
+		Model = glm::rotate(Model, glm::radians(angulo), glm::vec3(0.0f, 1.0f, 0.0f));
+		Model = glm::translate(Model, -centro);
 
 		Centro = centro;
 		Texture = texture;
 
 		float xsizeE;
 		float xsizeD;
-		float xcentroE;
-		float xcentroD;
 		glm::vec3 centroE;
 		glm::vec3 centroC;
 		glm::vec3 centroD;
@@ -417,19 +416,16 @@ public:
 		float yTopo = centro.y + ysize / 2; // 1.5
 		float yBottom = centro.y - ysize / 2; // -1.5
 
-		float yTopJanela = centro.y - distanciajanela.y + ysizejanela / 2; // 0 - 0.5 + 0.5 = 0
-		float yBottomJanela = centro.y - distanciajanela.y - ysizejanela / 2; // 0 - 0.5 - 0.5 = -1
+		float yTopJanela = centro.y - distanciajanela.y + ysizejanela / 2;
+		float yBottomJanela = centro.y - distanciajanela.y - ysizejanela / 2;
 
 		xsizeE = xsize / 2 + distanciajanela.x - xsizejanela / 2;
-		xcentroE = xsizeE / 2 - distanciajanela.x + xsizejanela / 2;
 		xsizeD = xsize - xsizeE - xsizejanela;
-		xcentroD = centro.x - xsize / 2 + xsizeD / 2;
 
-
-		centroE = centro + glm::vec3(xcentroE, 0, 0);
-		centroC = centro - distanciajanela + glm::vec3(0, ysizejanela / 2 + (yTopo - yTopJanela)/ 2, 0); // 0 - 0.5 + 0.5 + (1.5 - 0)/2 = 0.75 = 1.5 e até 0 
-		centroD = centro + glm::vec3(xcentroD, 0, 0);
-		centroB = centro - distanciajanela + glm::vec3(0, - ysizejanela / 2 - (yBottomJanela - yBottom) / 2, 0); // 0 - 0.5 - 0.5 + (1.5 - 0)/2 = 0.75 = 1.5 e até 0 
+		centroE = centro + glm::vec3(distanciajanela.x -xsizejanela/2 - xsizeE/2, 0, 0);
+		centroC = centro + glm::vec3(distanciajanela.x, -distanciajanela.y + ysizejanela / 2 + (yTopo - yTopJanela)/2, 0);
+		centroD = centro + glm::vec3(distanciajanela.x + xsizejanela/2 + xsizeD/2, 0, 0);
+		centroB = centro + glm::vec3(distanciajanela.x, -distanciajanela.y - ysizejanela / 2 - (yBottomJanela - yBottom)/2, 0);
 
 		ParedeETV = 0;
 		ParedeETI = 0;
@@ -437,18 +433,18 @@ public:
 
 		ParedeCTV = 0;
 		ParedeCTI = 0;
-		ParedeCVAO = CarregaQuadrilatero(ParedeCTV, ParedeCTI, 1, xsizejanela, yTopo - yTopJanela, zsize, centroC); // 1,5
+		ParedeCVAO = CarregaQuadrilatero(ParedeCTV, ParedeCTI, 1, xsizejanela, yTopo - yTopJanela, zsize, centroC); 
 
 		ParedeBTV = 0;
 		ParedeBTI = 0;
-		ParedeBVAO = CarregaQuadrilatero(ParedeBTV, ParedeBTI, 1, xsizejanela, yBottomJanela - yBottom, zsize, centroB); // -1 - -1.5 = 0.5
+		ParedeBVAO = CarregaQuadrilatero(ParedeBTV, ParedeBTI, 1, xsizejanela, yBottomJanela - yBottom, zsize, centroB); 
 
 		ParedeDTV = 0;
 		ParedeDTI = 0;
 		ParedeDVAO = CarregaQuadrilatero(ParedeDTV, ParedeDTI, 1, xsizeD, ysize, zsize, centroD);
 	}
 
-	void Render(Shader* shader) {
+	void Render(Shader* shader) const {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, Texture);
 
@@ -469,7 +465,7 @@ public:
 		glDrawElements(GL_TRIANGLES, ParedeBTI, GL_UNSIGNED_INT, nullptr);
 	}
 
-	void Delete() {
+	void Delete() const {
 		glDeleteBuffers(1, &ParedeEVAO);
 		glDeleteBuffers(1, &ParedeDVAO);
 		glDeleteBuffers(1, &ParedeCVAO);

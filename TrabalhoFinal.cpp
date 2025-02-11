@@ -70,10 +70,31 @@ int main() {
 
 	Floor floor(TexturaGramaTerrorId, 1000.0f, 1.0f, 1000.0f, glm::vec3(0.0f, -2.0f, 0.0f));
 	Floor floor2(BrancoId, 1.0f, 10.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
-	ParedeJanela parede1(BrancoId, 10.0f, 3.0f, 0.3f, 2.0f, 1.5f, glm::vec3(0.0f, 0.0f, -10.0f), glm::vec3(0.0f,0.0f, 0.0f));
-	ParedePorta parede2(BrancoId, 10.0f, 3.0f, 0.3f, 1.0f, 2.0f, glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f,0.5f,0.0f));
-	Parede parede3(BrancoId, 0.3f, 3.0f, 20.0f, glm::vec3(-5.0f, 0.0f, 0.0f));
-	Parede parede4(BrancoId, 0.3f, 3.0f, 20.0f, glm::vec3(5.0f, 0.0f, 0.0f));
+
+	// Parede de trás
+	ParedeJanela paredeT1(BrancoId, 4.0f, 3.0f, 0.3f, 2.0f, 1.5f, 0, glm::vec3(3.0f, 0.0f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	ParedeJanela paredeT2(BrancoId, 4.0f, 3.0f, 0.3f, 2.0f, 1.5f, 0, glm::vec3(-3.0f, 0.0f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	ParedeJanela paredeT3(BrancoId, 2.0f, 3.0f, 0.3f, 1.0f, 1.5f, 0, glm::vec3(0.0f, 0.0f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+	// Paredes Laterais
+	ParedeJanela paredeL1(BrancoId, 12.0f, 3.0f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(-5.0f, 0.0f, 4.0f), glm::vec3(4.0f, -0.25f, 0.0f));
+	ParedeJanela paredeL2(BrancoId, 12.0f, 3.0f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(5.0f, 0.0f, 4.0f), glm::vec3(4.0f, -0.25f, 0.0f));
+	ParedeJanela paredeL3(BrancoId, 8.0f, 3.0f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(-5.0f, 0.0f, -6.0f), glm::vec3(0.0f, -0.25f, 0.0f));
+	ParedeJanela paredeL4(BrancoId, 8.0f, 3.0f, 0.3f, 3.0f, 1.0f, -90, glm::vec3(5.0f, 0.0f, -6.0f), glm::vec3(0.0f, -0.25f, 0.0f));
+
+	// Parede da Frente
+	ParedeJanela paredeF1(BrancoId, 4.0f, 3.0f, 0.3f, 1.0f, 1.5f, 0, glm::vec3(3.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	ParedePorta paredeF2(BrancoId, 2.0f, 3.0f, 0.3f, 1.0f, 2.0f, 0, glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f,0.5f,0.0f));
+	ParedeJanela paredeF3(BrancoId, 4.0f, 3.0f, 0.3f, 1.0f, 1.5f, 0, glm::vec3(-3.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+	// Parede que divisa o corredor da sala principal
+	Bloco paredeD1(BrancoId, 4.0f, 3.0f, 0.3f, glm::vec3(3.0f, 0.0f, -2.0f));
+	ParedePorta paredeD2(BrancoId, 2.0f, 3.0f, 0.3f, 1.0f, 2.0f, 0, glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 0.5f, 0.0f));
+	Bloco paredeD3(BrancoId, 4.0f, 3.0f, 0.3f, glm::vec3(-3.0f, 0.0f, -2.0f));
+
+	// Paredes do corredor
+	ParedePorta paredeC1(BrancoId, 8.0f, 3.0f, 0.3f, 1.0f, 2.0f, -90, glm::vec3(1.0f, 0.0f, -6.0f), glm::vec3(2.5f, 0.5f, 0.0f));
+	ParedePorta paredeC2(BrancoId, 8.0f, 3.0f, 0.3f, 1.0f, 2.0f, -90, glm::vec3(-1.0f, 0.0f, -6.0f), glm::vec3(2.5f, 0.5f, 0.0f));
 
 
 	std::array<Arvore, NUM_ARV> arvores;
@@ -227,10 +248,27 @@ int main() {
 
 		floor.Render(&ObjectShader);
 		floor2.Render(&ObjectShader);
-		parede1.Render(&ObjectShader);
-		parede2.Render(&ObjectShader);
-		parede3.Render(&ObjectShader);
-		parede4.Render(&ObjectShader);
+		// Paredes de Trás
+		paredeT1.Render(&ObjectShader);
+		paredeT2.Render(&ObjectShader);
+		paredeT3.Render(&ObjectShader);
+		// Paredes da Frente
+		paredeF1.Render(&ObjectShader);
+		paredeF2.Render(&ObjectShader);
+		paredeF3.Render(&ObjectShader);
+		// Paredes Laterais
+		paredeL1.Render(&ObjectShader);
+		paredeL2.Render(&ObjectShader);
+		paredeL3.Render(&ObjectShader);
+		paredeL4.Render(&ObjectShader);
+		// Parede divisória
+		paredeD1.Render(&ObjectShader);
+		paredeD2.Render(&ObjectShader);
+		paredeD3.Render(&ObjectShader);
+		// Paredes corredor
+		paredeC1.Render(&ObjectShader);
+		paredeC2.Render(&ObjectShader);
+
 
 		for (int i = 0; i < NUM_ARV; i++) {
 			arvores[i].Render(&ObjectShader);
