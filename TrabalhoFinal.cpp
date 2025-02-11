@@ -25,8 +25,13 @@ int main() {
 	std::srand(std::time(0));
 	setlocale(LC_ALL, "pt_BR");
 	assert(glfwInit() == GLFW_TRUE);
-
-	GLFWwindow* window = glfwCreateWindow(Width, Height, "CG com OpenGL", nullptr, nullptr);
+	
+	glfwWindowHint(GLFW_DECORATED, NULL);
+	GLFWmonitor* MyMonitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(MyMonitor);
+	Width = mode->width;
+	Height = mode->height;
+	GLFWwindow* window = glfwCreateWindow(Width, Height, "CG com OpenGL", MyMonitor, nullptr);
 	assert(window);
 
 	glfwMakeContextCurrent(window);
