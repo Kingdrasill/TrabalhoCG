@@ -457,6 +457,12 @@ public:
 	void Delete() const {
 		glDeleteBuffers(1, &BlocoVAO);
 	}
+
+	void Rotate(float angulo) {
+		Model = glm::translate(Model, Centro);
+		Model = glm::rotate(Model, glm::radians(angulo), glm::vec3(0.0f, 0.0f, 1.0f));
+		Model = glm::translate(Model, -Centro);
+	}
 };
 
 class ParedePorta {
@@ -974,6 +980,8 @@ class Casa {
 
 	Roof roof;
 
+	Floor teto;
+
 	Floor chao;
 
 	Floor passarela;
@@ -1041,6 +1049,9 @@ public:
 		cadeirasCentral[5] = Cadeira(textMId, textMId, 0.75, 1, 1, glm::vec3(-1.75, -0.9, 6), 1);
 		lanternaCentral = Lanterna(textLId, textLBId, 0.5, 0.6, 0.5, glm::vec3(0, 0, 4));
 
+		// Teto completo
+		teto = Floor(textWallId, 10.0f, 20.0f, 0.1f, 2, glm::vec3(0, 2.0, 0), 90.0f);
+
 		// Corredor
 		mesaCorredor = Mesa(textMId, textMId, 1, 1, 0.5, glm::vec3(0, -0.9, -9.6));
 
@@ -1098,6 +1109,9 @@ public:
 		}
 		lanternaCentral.Render(shader);
 
+		// Teto completo
+		teto.Render(shader);
+
 		// Corredor
 		mesaCorredor.Render(shader);
 
@@ -1154,6 +1168,9 @@ public:
 			cadeirasCentral[i].Delete();
 		}
 
+		// Teto completo
+		teto.Delete();
+
 		// Corredor
 		mesaCorredor.Delete();
 
@@ -1172,6 +1189,49 @@ public:
 	void Rotate(float angulo) {
 		lanternaMundo.Rotate(angulo);
 	}
+};
+
+class Slenderman {
+public:
+	Bloco PE;
+	Bloco PD;
+	Bloco Corpo;
+	Bloco BE;
+	Bloco BD;
+	Bloco Cabeca;
+
+	Slenderman(){}
+
+	Slenderman(GLuint textureCorpo, GLuint textureCabeca, glm::vec3 centro) {
+		Corpo = Bloco(textureCorpo, 0.7, 1.0f, 0.15, centro);
+		PE = Bloco(textureCorpo, 0.1, 1.0f, 0.1, centro + glm::vec3(-0.3, -1, 0));
+		PD = Bloco(textureCorpo, 0.1, 1.0f, 0.1, centro + glm::vec3(0.3, -1, 0));
+		BE = Bloco(textureCorpo, 0.1, 1.0, 0.1, centro + glm::vec3(-0.35, 0.0, 0));
+		BD = Bloco(textureCorpo, 0.1, 1.0, 0.1, centro + glm::vec3(0.35, 0.0, 0));
+		Cabeca = Bloco(textureCabeca, 0.3, 0.3, 0.3, centro + glm::vec3(0, 0.65, 0));
+
+		BE.Rotate(-15);
+		BD.Rotate(25);
+	}
+
+	void Render(Shader* shader) const {
+		Corpo.Render(shader);
+		PE.Render(shader);
+		PD.Render(shader);
+		BE.Render(shader);
+		BD.Render(shader);
+		Cabeca.Render(shader);
+	}
+
+	void Delete() const {
+		Corpo.Delete();
+		PD.Delete();
+		PE.Delete();
+		BE.Delete();
+		BD.Delete();
+		Cabeca.Delete();
+	}
+
 };
 
 class Moon {

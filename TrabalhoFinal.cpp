@@ -11,7 +11,7 @@ void ScrollCallback(GLFWwindow* Window, double xoffset, double yoffset);
 int Width = 1280;
 int Height = 720;
 
-Camera camera(glm::vec3(0.0f,0.0f,30.0f));
+Camera camera(glm::vec3(0.0f,0.0f,0.0f));
 float lastX = Width / 2.0f;
 float lastY = Height / 2.0f;
 bool firstMouse = true;
@@ -73,6 +73,7 @@ int main() {
 	GLuint LanternBoxId = CarregarTextura("textures/metal.jpg");
 	GLuint MundoId = CarregarTextura("textures/mundo.jpg");
 	Casa casa = Casa(WallId, RoofId, FoundationId, PavingId, TableId, LanternId, LanternBoxId, MundoId);
+	Slenderman enderman = Slenderman(MundoId, LanternId, glm::vec3(0,0,0));
 
 	glm::vec3 L1Pos = glm::vec3((7.0f / 3.0f), 0.35f, 15.0f);
 	glm::vec3 L2Pos = glm::vec3(-(7.0f / 3.0f), 0.35, 15.0f);
@@ -211,6 +212,7 @@ int main() {
 		casa.Rotate(0.5);
 		lanterna1.Render(&ObjectShader);
 		lanterna2.Render(&ObjectShader);
+		enderman.Render(&ObjectShader);
 
 	   // Adicionado Luz Objeto
 		LightShader.Use();
@@ -232,6 +234,7 @@ int main() {
 	casa.Delete();
 	lanterna1.Delete();
 	lanterna2.Delete();
+	enderman.Delete();
 	glfwTerminate();
 	return 0;
 }
