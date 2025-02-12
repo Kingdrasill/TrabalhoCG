@@ -73,7 +73,11 @@ int main() {
 	GLuint LanternBoxId = CarregarTextura("textures/metal.jpg");
 	GLuint MundoId = CarregarTextura("textures/mundo.jpg");
 	Casa casa = Casa(WallId, RoofId, FoundationId, PavingId, TableId, LanternId, LanternBoxId, MundoId);
-	Slenderman enderman = Slenderman(MundoId, LanternId, glm::vec3(0,0,0));
+
+
+	GLuint RoxoId = CarregarTextura("textures/roxo.jpg");
+	GLuint PretoId = CarregarTextura("textures/preto.jpg");
+	Slenderman enderman = Slenderman(PretoId, RoxoId, glm::vec3(0,0.8,-20));
 
 	glm::vec3 L1Pos = glm::vec3((7.0f / 3.0f), 0.35f, 15.0f);
 	glm::vec3 L2Pos = glm::vec3(-(7.0f / 3.0f), 0.35, 15.0f);

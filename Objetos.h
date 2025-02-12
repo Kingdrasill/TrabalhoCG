@@ -1199,28 +1199,49 @@ public:
 	Bloco BE;
 	Bloco BD;
 	Bloco Cabeca;
+	Bloco Olho1;
+	Bloco Olho2;
+
+	GLuint t1;
+	GLuint t2;
+
+	int count = 0;
 
 	Slenderman(){}
 
 	Slenderman(GLuint textureCorpo, GLuint textureCabeca, glm::vec3 centro) {
-		Corpo = Bloco(textureCorpo, 0.7, 1.0f, 0.15, centro);
-		PE = Bloco(textureCorpo, 0.1, 1.0f, 0.1, centro + glm::vec3(-0.3, -1, 0));
-		PD = Bloco(textureCorpo, 0.1, 1.0f, 0.1, centro + glm::vec3(0.3, -1, 0));
-		BE = Bloco(textureCorpo, 0.1, 1.0, 0.1, centro + glm::vec3(-0.35, 0.0, 0));
-		BD = Bloco(textureCorpo, 0.1, 1.0, 0.1, centro + glm::vec3(0.35, 0.0, 0));
-		Cabeca = Bloco(textureCabeca, 0.3, 0.3, 0.3, centro + glm::vec3(0, 0.65, 0));
+		Corpo = Bloco(textureCorpo, 0.5, 0.6f, 0.15, centro);
+		PE = Bloco(textureCorpo, 0.1, 2.0f, 0.1, centro + glm::vec3(-0.18, -1.3, 0));
+		PD = Bloco(textureCorpo, 0.1, 2.0f, 0.1, centro + glm::vec3(0.18, -1.3, 0));
+		BE = Bloco(textureCorpo, 0.1, 2.0, 0.1, centro + glm::vec3(-0.35, -0.7, 0));
+		BD = Bloco(textureCorpo, 0.1, 2.0, 0.1, centro + glm::vec3(0.35, -0.7, 0));
+		Cabeca = Bloco(textureCorpo, 0.5, 0.4, 0.3, centro + glm::vec3(0, 0.5, 0));
+		Olho1 = Bloco(textureCabeca, 0.2, 0.05, 0.1, centro + glm::vec3(-0.14, 0.5, 0.12));
+		Olho2 = Bloco(textureCabeca, 0.2, 0.05, 0.1, centro + glm::vec3(0.14, 0.5, 0.12));
 
-		BE.Rotate(-15);
-		BD.Rotate(25);
+		t1 = textureCorpo;
+		t2 = textureCabeca;
+
+		BE.Rotate(-5);
+		BD.Rotate(5);
 	}
 
-	void Render(Shader* shader) const {
+	void Render(Shader* shader) {
+		if (count == 128) {
+			Olho1.Texture = (Olho1.Texture == t1) ? t2 : t1;
+			Olho2.Texture = (Olho2.Texture == t1) ? t2 : t1;
+			count = 0;
+		}
+		count++;
+
 		Corpo.Render(shader);
 		PE.Render(shader);
 		PD.Render(shader);
 		BE.Render(shader);
 		BD.Render(shader);
 		Cabeca.Render(shader);
+		Olho1.Render(shader);
+		Olho2.Render(shader);
 	}
 
 	void Delete() const {
@@ -1230,6 +1251,8 @@ public:
 		BE.Delete();
 		BD.Delete();
 		Cabeca.Delete();
+		Olho1.Delete();
+		Olho2.Delete();
 	}
 
 };
